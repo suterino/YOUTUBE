@@ -1,0 +1,32 @@
+
+file mapping:
+  mac: Volumes/cloud
+  dxp8800: volume3/cloud
+  nginx: http://192.168.1.16:8080/shared3/cloud/
+
+# follow youtuber
+https://www.youtube.com/@MarcoCasario
+    language:it
+    transcript: ./transcript
+    html_summary (mac): /Volumes/cloud/GitHub/FINANCE/youtube/MarcoCasario,
+
+https://www.youtube.com/@DrVitoZennaro
+    language:it
+    transcript:	./transcript
+    html_summary (mac): /Volumes/cloud/GitHub/HEALTH/personal-health/massimo/health-goals/youtube/VitoZennaro
+
+https://www.youtube.com/@dottvaleriosolari
+    language:it
+    html_summary (mac): /Volumes/cloud/GitHub/HEALTH/personal-health/massimo/health-goals/youtube/ValerioSolari
+    
+https://www.youtube.com/@NateBJones
+    language:it
+    html_summary (mac): /Volumes/cloud/GitHub/AI_companies/youtube/NateBJones
+
+
+# videos to transcript
+## Top 10 Foods You Must Eat After 50 (Anti-Aging Benefits!)
+https://www.youtube.com/watch?v=ZkntfHTNi08
+  language:it
+  transcript: ./transcript
+  html_summary (mac): /Volumes/cloud/GitHub/HEALTH/personal-health/massimo/health-goals/youtube/other

@@ -1,0 +1,31 @@
+
+SOURCES
+https://www.youtube.com/@MarcoCasario
+https://www.youtube.com/@DrVitoZennaro
+https://www.youtube.com/@NateBJones
+
+
+
+
+I Mercati seguono i REGIMI Economici e Il MEGLIO potrebbe essere Passato
+https://www.youtube.com/watch?v=7DQkUFM6uvo&t=1689s
+date: 2/16/2026
+transcript: IMercatiSeguono.it.vtt
+  # Download transcript
+  yt-dlp --write-auto-sub --sub-lang it --skip-download -o IMercatiSeguono "https://www.youtube.com/watch?v=7DQkUFM6uvo&t=1689s"
+claude summary:   
+
+
+(base) massimo@Thanos YOUTUBE % more ../HEALTH/personal-health/massimo/health-goals/ValerioSolari/SOURCES.md
+
+Come "Sturare" le Tue Arterie Naturalmente (Senza Farmaci)
+https://www.youtube.com/watch?v=ajmjPrJJaWc
+
+Pressione Alta? 5 Strategie Naturali Che Funzionano DAVVERO
+http://youtube.com/watch?v=WMs1v_7ImGw&t=2s
+
+
+# Download auto-generated subtitles
+yt-dlp --write-auto-sub --sub-lang it --skip-download -o transcript "VIDEO_URL"
+yt-dlp --write-auto-sub --sub-lang it --skip-download -o come_sturare_le_tue_arterie "https://www.youtube.com/watch?v=ajmjPrJJaWc"
+yt-dlp --write-auto-sub --sub-lang it --skip-download -o PressioneAlta_5_Strategie_Naturali_Che_Funzionano_DAVVERO 'https://www.youtube.com/watch?v=WMs1v_7ImGw&t=3s
