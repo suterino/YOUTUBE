@@ -2,12 +2,15 @@
 """
 YouTube Follow - Latest Videos Tracker
 
-Reads follow.txt, fetches recent videos from YouTube channels,
-generates an interactive HTML page with embedded videos and transcript download.
+Reads follow.json, fetches recent videos from YouTube channels,
+generates an interactive HTML page with embedded videos, transcript download,
+and auto-generates HTML summaries via Claude CLI.
 
 Usage:
-    python3 youtube_follow.py           # Fetch videos, generate HTML, start server
-    python3 youtube_follow.py --serve   # Just start server (skip fetching)
+    python3 youtube_follow.py                    # Fetch videos, generate HTML, start server
+    python3 youtube_follow.py --serve            # Just start server (skip fetching)
+    python3 youtube_follow.py --generate-only    # Fetch + generate HTML, then exit (no server)
+    python3 youtube_follow.py --generate-summaries  # Generate summaries for all transcripts missing one
 """
 
 import subprocess
@@ -18,22 +21,99 @@ import re
 import html
 import urllib.request
 import xml.etree.ElementTree as ET
+import threading
 from datetime import datetime, timedelta
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import unicodedata
 import time
 
 # ============================================================
-# CONFIGURATION
+# CONFIGURATION (defaults, overridden by follow.json)
 # ============================================================
-DAYS_BACK = 10                     # How many days back to look for videos
-FOLLOW_FILE = "follow.txt"         # File with YouTube channel URLs
-OUTPUT_HTML = "latest_videos.html"  # Output HTML file
-TRANSCRIPTS_DIR = "transcripts"    # Directory for downloaded transcripts
+FOLLOW_FILE = "follow.json"
+OUTPUT_HTML = "latest_videos.html"
 HISTORY_FILE = os.path.join("transcripts", "history.json")
-SERVER_PORT = 8080                 # Local server port
-DEFAULT_LANG = "en"                # Default subtitle language if not specified
+
+# These get overridden from follow.json in main()
+DAYS_BACK = 10
+TRANSCRIPTS_DIR = "transcripts"
+SERVER_PORT = 8081
+DEFAULT_LANG = "en"
+API_BASE = ""
+
+# Global config dict, loaded from follow.json
+CONFIG = {}
 # ============================================================
+
+SUMMARY_PROMPT = """Read this VTT transcript and create a comprehensive HTML summary.
+
+Title: {title}
+Channel: {channel}
+Date: {date}
+
+Requirements:
+- Standalone HTML file with dark theme (background #0f0f0f, text #f1f1f1)
+- Include: title, channel, date at the top
+- Table of contents with anchor links
+- Break content into logical sections with clear headings
+- Use highlight boxes for key points
+- Include a glossary if technical terms are used
+- Responsive design
+- Do NOT include any <script> tags
+- Output ONLY the HTML, no markdown fences or explanation
+"""
+
+
+def resolve_root(file_mapping):
+    """Detect which platform we're on and return the correct root path.
+
+    Checks paths in order: docker (/data), dxp8800 (/volume3/cloud), mac (/Volumes/cloud).
+    """
+    check_order = [
+        ("docker", file_mapping.get("docker", "/data")),
+        ("dxp8800", file_mapping.get("dxp8800", "/volume3/cloud")),
+        ("mac", file_mapping.get("mac", "/Volumes/cloud")),
+    ]
+    for platform, path in check_order:
+        if os.path.isdir(path):
+            print(f"  Platform detected: {platform} (root: {path})")
+            return path
+    # Fallback to current directory
+    print("  Warning: No known root found, using current directory")
+    return os.getcwd()
+
+
+def load_config(filepath):
+    """Load follow.json and return the config dict."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def read_follow_json(filepath):
+    """Read follow.json and return channels list, videos list, and config dict.
+
+    Each channel/video entry includes url, language, html_summary_path.
+    """
+    config = load_config(filepath)
+
+    channels = []
+    for ch in config.get("channels", []):
+        channels.append({
+            "url": ch["url"],
+            "language": ch.get("language", config.get("default_language", "en")),
+            "html_summary_path": ch.get("html_summary_path", ""),
+        })
+
+    videos = []
+    for v in config.get("videos", []):
+        videos.append({
+            "url": v["url"],
+            "language": v.get("language", config.get("default_language", "en")),
+            "html_summary_path": v.get("html_summary_path", ""),
+            "title": v.get("title", ""),
+        })
+
+    return channels, videos, config
 
 
 def load_history():
@@ -49,32 +129,6 @@ def save_history(history):
     os.makedirs(TRANSCRIPTS_DIR, exist_ok=True)
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2, ensure_ascii=False)
-
-
-def read_follow_file(filepath):
-    """Read follow.txt and return channels and individual video URLs.
-
-    Lines starting with # are comments and are ignored.
-    Channel URLs contain /@, individual video URLs contain /watch?v=.
-    Format: URL [language:XX]
-    """
-    channels = []
-    videos = []
-    with open(filepath, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if not line.startswith("http"):
-                continue
-            lang_match = re.search(r"language:(\w+)", line)
-            lang = lang_match.group(1) if lang_match else DEFAULT_LANG
-            url = line.split()[0]
-            if "watch?v=" in url or "youtu.be/" in url:
-                videos.append({"url": url, "language": lang})
-            else:
-                channels.append({"url": url, "language": lang})
-    return channels, videos
 
 
 def get_channel_name(url):
@@ -234,7 +288,7 @@ def fetch_recent_videos(channel_url, days_back, language=DEFAULT_LANG):
 
 
 def download_individual_videos(video_entries):
-    """Download transcripts for individual video URLs from follow.txt.
+    """Download transcripts for individual video URLs from follow.json.
 
     Skips videos already in history. Updates history.json on success.
     """
@@ -317,8 +371,19 @@ def download_individual_videos(video_entries):
                     "view_count": view_count,
                     "filename": filename,
                     "downloaded_at": datetime.now().isoformat(),
+                    "html_summary_path": entry.get("html_summary_path", ""),
                 })
                 save_history(history)
+
+                # Trigger summary generation in background
+                if entry.get("html_summary_path"):
+                    transcript_path = os.path.join(TRANSCRIPTS_DIR, filename)
+                    threading.Thread(
+                        target=generate_summary,
+                        args=(transcript_path, channel, title, upload_date, CONFIG),
+                        kwargs={"html_summary_path": entry["html_summary_path"]},
+                        daemon=True,
+                    ).start()
             else:
                 stderr_lines = result.stderr.strip().split("\n") if result.stderr else []
                 error_msg = stderr_lines[-1] if stderr_lines else "No subtitle file created"
@@ -360,7 +425,312 @@ def build_transcript_filename(channel, upload_date, title):
     return f"{channel}-{date_fmt}-{title_fmt}"
 
 
-def generate_html(all_videos):
+def find_channel_summary_path(channel_name, config):
+    """Find the html_summary_path for a channel by matching its name."""
+    for ch in config.get("channels", []):
+        if get_channel_name(ch["url"]) == channel_name:
+            return ch.get("html_summary_path", "")
+    for v in config.get("videos", []):
+        # For individual videos, we can't match by channel name easily
+        pass
+    return ""
+
+
+def generate_summary(transcript_path, channel_name, title, upload_date, config,
+                     html_summary_path=None):
+    """Generate an HTML summary from a transcript using Claude CLI.
+
+    Runs claude -p with the transcript content piped in.
+    Writes the resulting HTML to the appropriate summary directory.
+    Updates history.json with the summary path.
+    """
+    if not html_summary_path:
+        html_summary_path = find_channel_summary_path(channel_name, config)
+    if not html_summary_path:
+        print(f"  [Summary] No html_summary_path for {channel_name}, skipping")
+        return
+
+    # Resolve to absolute path
+    root = resolve_root(config.get("file_mapping", {}))
+    summary_dir = os.path.join(root, html_summary_path)
+    os.makedirs(summary_dir, exist_ok=True)
+
+    # Build summary filename from transcript filename
+    transcript_basename = os.path.basename(transcript_path)
+    # Remove language and .vtt extension: foo.en.vtt -> foo.html
+    summary_name = re.sub(r"\.\w+\.vtt$", ".html", transcript_basename)
+    summary_path = os.path.join(summary_dir, summary_name)
+
+    if os.path.exists(summary_path):
+        print(f"  [Summary] Already exists: {summary_path}")
+        return
+
+    # Read transcript content
+    try:
+        with open(transcript_path, "r", encoding="utf-8") as f:
+            transcript_content = f.read()
+    except Exception as e:
+        print(f"  [Summary] Error reading transcript: {e}")
+        return
+
+    date_display = format_date_display(upload_date)
+    prompt = SUMMARY_PROMPT.format(
+        title=title,
+        channel=channel_name,
+        date=date_display,
+    )
+
+    print(f"  [Summary] Generating summary for: {title}")
+    print(f"  [Summary] Output: {summary_path}")
+
+    try:
+        result = subprocess.run(
+            ["claude", "-p", prompt, "--output-format", "text"],
+            input=transcript_content,
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            with open(summary_path, "w", encoding="utf-8") as f:
+                f.write(result.stdout)
+            print(f"  [Summary] Generated: {summary_name}")
+
+            # Update history.json with summary info
+            _update_history_summary(transcript_path, summary_path, config)
+
+            # Update index pages
+            update_indexes(config)
+        else:
+            stderr = result.stderr.strip() if result.stderr else "No output"
+            print(f"  [Summary] Claude CLI failed: {stderr}")
+    except FileNotFoundError:
+        print("  [Summary] Claude CLI not found. Install with: npm install -g @anthropic-ai/claude-code")
+    except subprocess.TimeoutExpired:
+        print("  [Summary] Claude CLI timed out (300s)")
+    except Exception as e:
+        print(f"  [Summary] Error: {e}")
+
+
+def _update_history_summary(transcript_path, summary_path, config):
+    """Update history.json entry with summary_path info."""
+    history = load_history()
+    transcript_basename = os.path.basename(transcript_path)
+
+    for entry in history:
+        if entry.get("filename") == transcript_basename:
+            # Store relative summary path (relative to root)
+            root = resolve_root(config.get("file_mapping", {}))
+            if summary_path.startswith(root):
+                entry["summary_path"] = summary_path[len(root):].lstrip("/")
+            else:
+                entry["summary_path"] = summary_path
+            entry["summary_generated_at"] = datetime.now().isoformat()
+            break
+
+    save_history(history)
+
+
+def update_indexes(config):
+    """Generate global and per-channel index pages listing all summaries."""
+    root = resolve_root(config.get("file_mapping", {}))
+    nginx_base = config.get("file_mapping", {}).get("nginx_base", "")
+    history = load_history()
+
+    # Filter to entries with summaries
+    summarized = [e for e in history if e.get("summary_path")]
+    if not summarized:
+        return
+
+    # Global index
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    global_index_path = os.path.join(script_dir, "summaries_index.html")
+    _write_index_html(
+        global_index_path,
+        "YouTube Summaries - All Channels",
+        summarized,
+        root,
+        nginx_base,
+    )
+    print(f"  [Index] Updated global index: {global_index_path}")
+
+    # Per-channel indexes
+    channels_paths = {}
+    for ch in config.get("channels", []):
+        name = get_channel_name(ch["url"])
+        channels_paths[name] = ch.get("html_summary_path", "")
+
+    for channel_name, rel_path in channels_paths.items():
+        if not rel_path:
+            continue
+        channel_dir = os.path.join(root, rel_path)
+        if not os.path.isdir(channel_dir):
+            continue
+        channel_entries = [e for e in summarized if e.get("channel") == channel_name]
+        if not channel_entries:
+            continue
+        index_path = os.path.join(channel_dir, "index.html")
+        _write_index_html(
+            index_path,
+            f"YouTube Summaries - {channel_name}",
+            channel_entries,
+            root,
+            nginx_base,
+        )
+        print(f"  [Index] Updated {channel_name} index: {index_path}")
+
+
+def _write_index_html(path, title, entries, root, nginx_base):
+    """Write a dark-themed index HTML page listing summary links."""
+    entries_sorted = sorted(entries, key=lambda e: e.get("upload_date", ""), reverse=True)
+
+    rows = ""
+    for e in entries_sorted:
+        summary_rel = e.get("summary_path", "")
+        if nginx_base and summary_rel:
+            summary_url = f"{nginx_base}/{summary_rel}"
+        else:
+            summary_url = summary_rel
+        channel_text = html.escape(e.get("channel", ""))
+        title_text = html.escape(e.get("title", ""))
+        date_text = format_date_display(e.get("upload_date", ""))
+        video_url = html.escape(e.get("url", ""))
+        rows += f"""
+        <tr>
+          <td class="channel-cell">{channel_text}</td>
+          <td class="title-cell"><a href="{html.escape(summary_url)}">{title_text}</a></td>
+          <td class="date-cell">{date_text}</td>
+          <td class="link-cell"><a href="{video_url}" target="_blank">YouTube</a></td>
+        </tr>"""
+
+    index_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{html.escape(title)}</title>
+<style>
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+  body {{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f0f0f;
+    color: #f1f1f1;
+    padding: 20px;
+  }}
+  h1 {{
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 24px;
+    color: #ff4444;
+  }}
+  .subtitle {{
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }}
+  .table-container {{
+    overflow-x: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }}
+  table {{
+    width: 100%;
+    border-collapse: collapse;
+  }}
+  thead th {{
+    position: sticky;
+    top: 0;
+    background: #1a1a1a;
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #aaa;
+    border-bottom: 2px solid #333;
+  }}
+  tbody tr {{ border-bottom: 1px solid #222; }}
+  tbody tr:hover {{ background: #1a1a1a; }}
+  td {{ padding: 10px; vertical-align: middle; font-size: 14px; }}
+  .channel-cell {{ font-weight: 600; color: #ff8888; white-space: nowrap; }}
+  .title-cell a {{ color: #f1f1f1; text-decoration: none; }}
+  .title-cell a:hover {{ color: #ff4444; text-decoration: underline; }}
+  .date-cell {{ white-space: nowrap; color: #aaa; }}
+  .link-cell a {{ color: #6688ff; text-decoration: none; }}
+  .link-cell a:hover {{ text-decoration: underline; }}
+</style>
+</head>
+<body>
+<h1>{html.escape(title)}</h1>
+<p class="subtitle">{len(entries_sorted)} summaries &bull; Updated {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<div class="table-container">
+<table>
+<thead>
+  <tr>
+    <th>Channel</th>
+    <th>Title (Summary Link)</th>
+    <th>Date</th>
+    <th>Video</th>
+  </tr>
+</thead>
+<tbody>
+{rows}
+</tbody>
+</table>
+</div>
+</body>
+</html>"""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(index_html)
+
+
+def generate_all_summaries(config):
+    """Generate summaries for all history entries that don't have one yet.
+
+    Processes sequentially to avoid overwhelming Claude CLI.
+    """
+    history = load_history()
+    pending = [e for e in history if not e.get("summary_path")]
+    if not pending:
+        print("  All transcripts already have summaries.")
+        return
+
+    print(f"  Found {len(pending)} transcripts without summaries.\n")
+
+    for i, entry in enumerate(pending, 1):
+        filename = entry.get("filename", "")
+        transcript_path = os.path.join(TRANSCRIPTS_DIR, filename)
+
+        if not os.path.exists(transcript_path):
+            print(f"  [{i}/{len(pending)}] Skipping (file missing): {filename}")
+            continue
+
+        channel = entry.get("channel", "")
+        title = entry.get("title", "")
+        upload_date = entry.get("upload_date", "")
+
+        # Get html_summary_path from entry or look it up from config
+        html_summary_path = entry.get("html_summary_path", "")
+        if not html_summary_path:
+            html_summary_path = find_channel_summary_path(channel, config)
+
+        if not html_summary_path:
+            print(f"  [{i}/{len(pending)}] Skipping (no summary path): {channel} - {title}")
+            continue
+
+        print(f"  [{i}/{len(pending)}] {channel} - {title}")
+        generate_summary(
+            transcript_path, channel, title, upload_date, config,
+            html_summary_path=html_summary_path,
+        )
+
+    # Update indexes after all summaries are done
+    update_indexes(config)
+    print(f"\n  Done generating summaries.")
+
+
+def generate_html(all_videos, config):
     """Generate the HTML page with video table."""
     all_videos.sort(key=lambda v: v.get("upload_date", ""), reverse=True)
 
@@ -368,6 +738,9 @@ def generate_html(all_videos):
     history = load_history()
     downloaded_ids = {entry["video_id"] for entry in history if entry.get("video_id")}
     all_videos = [v for v in all_videos if v["video_id"] not in downloaded_ids]
+
+    api_base = config.get("api_base", "")
+    days_back = config.get("days_back", DAYS_BACK)
 
     # Build unique channel list for filter dropdown
     channels_seen = []
@@ -428,7 +801,7 @@ def generate_html(all_videos):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube Follow - Latest Videos (Last {DAYS_BACK} days)</title>
+<title>YouTube Follow - Latest Videos (Last {days_back} days)</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{
@@ -587,12 +960,35 @@ def generate_html(all_videos):
   }}
   .filter-bar select:hover {{ border-color: #555; }}
   .filter-bar select:focus {{ outline: none; border-color: #ff4444; }}
+  .summary-link {{
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6688ff;
+    text-decoration: none;
+  }}
+  .summary-link:hover {{ text-decoration: underline; }}
+  .summary-badge {{
+    display: inline-block;
+    background: #2a4a2a;
+    color: #44ff44;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 4px;
+  }}
 </style>
 </head>
 <body>
 
 <h1>YouTube Follow - Latest Videos</h1>
-<p class="subtitle">Videos published in the last {DAYS_BACK} days &bull; Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<p class="subtitle">Videos published in the last {days_back} days &bull; Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+<p style="text-align:center;margin-bottom:16px">
+  <a href="{config.get("file_mapping", {{}}).get("nginx_base", "")}/GitHub/YOUTUBE/summaries_index.html"
+     style="color:#6688ff;text-decoration:none;font-size:14px">
+     View All Summaries Index
+  </a>
+</p>
 
 <div class="filter-bar">
   <label for="channel-filter">Channel:</label>
@@ -643,6 +1039,7 @@ def generate_html(all_videos):
     <th>Date</th>
     <th>Language</th>
     <th>Views</th>
+    <th>Summary</th>
   </tr>
 </thead>
 <tbody id="downloaded-body">
@@ -652,6 +1049,8 @@ def generate_html(all_videos):
 </div>
 
 <script>
+const API_BASE = '{api_base}';
+const NGINX_BASE = '{config.get("file_mapping", {{}}).get("nginx_base", "")}';
 let currentTab = 'latest';
 
 function switchTab(tab) {{
@@ -659,7 +1058,7 @@ function switchTab(tab) {{
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelector('[onclick*=\"' + tab + '\"]').classList.add('active');
+  document.querySelector('[onclick*="' + tab + '"]').classList.add('active');
   if (tab === 'downloaded') loadDownloaded();
   else filterChannel();
 }}
@@ -700,14 +1099,22 @@ async function loadDownloaded() {{
   const tbody = document.getElementById('downloaded-body');
   const stats = document.getElementById('downloaded-stats');
   try {{
-    const resp = await fetch('/history');
+    const resp = await fetch(API_BASE + '/history');
     const data = await resp.json();
     stats.textContent = data.length + ' transcripts downloaded';
     if (data.length === 0) {{
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">No transcripts downloaded yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">No transcripts downloaded yet.</td></tr>';
       return;
     }}
-    tbody.innerHTML = data.map(v => `
+    tbody.innerHTML = data.map(v => {{
+      let summaryCell = '<td class="action-cell">-</td>';
+      if (v.summary_path) {{
+        const summaryUrl = NGINX_BASE + '/' + v.summary_path;
+        summaryCell = `<td class="action-cell"><a class="summary-link" href="${{summaryUrl}}" target="_blank" style="color:#44ff44;font-size:13px;font-weight:500">View Summary</a></td>`;
+      }} else {{
+        summaryCell = '<td class="action-cell"><span style="color:#666;font-size:12px">No summary</span></td>';
+      }}
+      return `
       <tr data-channel="${{escapeHtml(v.channel || '')}}">
         <td class="video-cell">
           <iframe width="280" height="158" src="https://www.youtube.com/embed/${{escapeHtml(v.video_id)}}"
@@ -720,12 +1127,13 @@ async function loadDownloaded() {{
         <td class="date-cell">${{formatDate(v.upload_date)}}</td>
         <td class="lang-cell">${{escapeHtml(v.language || '')}}</td>
         <td class="views-cell">${{v.view_count ? Number(v.view_count).toLocaleString() : 'N/A'}}</td>
+        ${{summaryCell}}
       </tr>
-    `).join('');
+    `}}).join('');
     filterChannel();
   }} catch (e) {{
     stats.textContent = 'Could not load history';
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Server not running.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Server not running at ' + API_BASE + '</td></tr>';
   }}
 }}
 
@@ -741,7 +1149,7 @@ async function downloadTranscript(btn) {{
   status.textContent = 'Downloading...';
 
   try {{
-    const resp = await fetch('/download-transcript', {{
+    const resp = await fetch(API_BASE + '/download-transcript', {{
       method: 'POST',
       headers: {{ 'Content-Type': 'application/json' }},
       body: JSON.stringify({{
@@ -759,6 +1167,9 @@ async function downloadTranscript(btn) {{
     if (data.success) {{
       status.className = 'status success';
       status.textContent = 'Downloaded: ' + data.filename;
+      if (data.summary_triggered) {{
+        status.textContent += ' (summary generating...)';
+      }}
       setTimeout(() => {{ btn.closest('tr').style.display = 'none'; }}, 1500);
     }} else {{
       status.className = 'status error';
@@ -767,7 +1178,7 @@ async function downloadTranscript(btn) {{
     }}
   }} catch (e) {{
     status.className = 'status error';
-    status.textContent = 'Server not running. Start with: python3 youtube_follow.py --serve';
+    status.textContent = 'Server not running at ' + API_BASE;
     btn.disabled = false;
   }}
 }}
@@ -795,8 +1206,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             history = load_history()
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(json.dumps(history, ensure_ascii=False).encode("utf-8"))
+        elif self.path == "/summaries":
+            history = load_history()
+            summaries = [e for e in history if e.get("summary_path")]
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(summaries, ensure_ascii=False).encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()
@@ -810,6 +1230,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             video_url = data.get("url", "")
             transcript_name = data.get("name", "transcript")
             sub_lang = data.get("lang", DEFAULT_LANG)
+            channel = data.get("channel", "")
+            title = data.get("title", "")
+            upload_date = data.get("upload_date", "")
 
             os.makedirs(TRANSCRIPTS_DIR, exist_ok=True)
             output_path = os.path.join(TRANSCRIPTS_DIR, transcript_name)
@@ -854,21 +1277,39 @@ class RequestHandler(BaseHTTPRequestHandler):
             except Exception as e:
                 response = {"success": False, "error": str(e)}
 
-            # Record successful download in history
+            # Record successful download in history and trigger summary
+            summary_triggered = False
             if response.get("success"):
+                # Find html_summary_path for this channel
+                html_summary_path = find_channel_summary_path(channel, CONFIG)
+
                 history = load_history()
                 history.append({
-                    "channel": data.get("channel", ""),
-                    "title": data.get("title", ""),
+                    "channel": channel,
+                    "title": title,
                     "url": video_url,
                     "video_id": data.get("video_id", ""),
-                    "upload_date": data.get("upload_date", ""),
+                    "upload_date": upload_date,
                     "language": sub_lang,
                     "view_count": data.get("view_count", 0),
                     "filename": response["filename"],
                     "downloaded_at": datetime.now().isoformat(),
+                    "html_summary_path": html_summary_path,
                 })
                 save_history(history)
+
+                # Trigger summary generation in background
+                if html_summary_path:
+                    transcript_path = os.path.join(TRANSCRIPTS_DIR, response["filename"])
+                    threading.Thread(
+                        target=generate_summary,
+                        args=(transcript_path, channel, title, upload_date, CONFIG),
+                        kwargs={"html_summary_path": html_summary_path},
+                        daemon=True,
+                    ).start()
+                    summary_triggered = True
+
+                response["summary_triggered"] = summary_triggered
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -888,32 +1329,59 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
 def main():
-    print(f"\nYouTube Follow - Fetching videos from the last {DAYS_BACK} days\n")
+    global DAYS_BACK, TRANSCRIPTS_DIR, SERVER_PORT, DEFAULT_LANG, API_BASE, CONFIG, HISTORY_FILE
 
     if not os.path.exists(FOLLOW_FILE):
         print(f"Error: {FOLLOW_FILE} not found!")
         sys.exit(1)
 
-    channels, individual_videos = read_follow_file(FOLLOW_FILE)
-    print(f"Found {len(channels)} channels and {len(individual_videos)} individual videos in {FOLLOW_FILE}:\n")
+    # Load config from JSON
+    channels, individual_videos, config = read_follow_json(FOLLOW_FILE)
+    CONFIG = config
+
+    # Override defaults from config
+    DAYS_BACK = config.get("days_back", DAYS_BACK)
+    TRANSCRIPTS_DIR = config.get("transcripts_dir", TRANSCRIPTS_DIR)
+    SERVER_PORT = config.get("server_port", SERVER_PORT)
+    DEFAULT_LANG = config.get("default_language", DEFAULT_LANG)
+    API_BASE = config.get("api_base", "")
+    HISTORY_FILE = os.path.join(TRANSCRIPTS_DIR, "history.json")
+
+    print(f"\nYouTube Follow - Fetching videos from the last {DAYS_BACK} days\n")
+    print(f"  Config: {FOLLOW_FILE}")
+    print(f"  Server port: {SERVER_PORT}")
+    print(f"  API base: {API_BASE}")
+    resolve_root(config.get("file_mapping", {}))
+    print()
+
+    print(f"Found {len(channels)} channels and {len(individual_videos)} individual videos:\n")
     for ch in channels:
         print(f"  - {get_channel_name(ch['url'])} (lang: {ch['language']})")
     for v in individual_videos:
         print(f"  - [video] {v['url']} (lang: {v['language']})")
     print()
 
+    # --generate-summaries: generate summaries for all existing transcripts
+    if "--generate-summaries" in sys.argv:
+        print("Generating summaries for existing transcripts...\n")
+        generate_all_summaries(config)
+        return
+
     # --serve: skip fetching, just serve existing HTML
     if "--serve" in sys.argv:
         if not os.path.exists(OUTPUT_HTML):
             print(f"Error: {OUTPUT_HTML} not found! Run without --serve first.")
             sys.exit(1)
-        print(f"Starting server at http://localhost:{SERVER_PORT}")
-        server = HTTPServer(("localhost", SERVER_PORT), RequestHandler)
+        print(f"Starting server at http://0.0.0.0:{SERVER_PORT}")
+        server = HTTPServer(("0.0.0.0", SERVER_PORT), RequestHandler)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
             print("\nServer stopped.")
         return
+
+    # --generate-only: fetch + generate HTML, then exit
+    generate_only = "--generate-only" in sys.argv
 
     # Download transcripts for individual videos
     if individual_videos:
@@ -930,7 +1398,7 @@ def main():
     print(f"\nTotal: {len(all_videos)} videos found\n")
 
     # Generate HTML even if no videos found (shows empty state)
-    html_content = generate_html(all_videos)
+    html_content = generate_html(all_videos, config)
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html_content)
     print(f"Generated {OUTPUT_HTML}")
@@ -938,10 +1406,17 @@ def main():
     # Create transcripts directory
     os.makedirs(TRANSCRIPTS_DIR, exist_ok=True)
 
+    # Update index pages if any summaries exist
+    update_indexes(config)
+
+    if generate_only:
+        print("\n--generate-only: done.")
+        return
+
     # Start server
-    print(f"\nStarting server at http://localhost:{SERVER_PORT}")
+    print(f"\nStarting server at http://0.0.0.0:{SERVER_PORT}")
     print("Press Ctrl+C to stop.\n")
-    server = HTTPServer(("localhost", SERVER_PORT), RequestHandler)
+    server = HTTPServer(("0.0.0.0", SERVER_PORT), RequestHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

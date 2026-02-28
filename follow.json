@@ -1,0 +1,48 @@
+{
+  "file_mapping": {
+    "mac": "/Volumes/cloud",
+    "dxp8800": "/volume3/cloud",
+    "docker": "/data",
+    "nginx_base": "http://192.168.1.16:8080/shared3/cloud"
+  },
+  "api_base": "http://192.168.1.16:8081",
+  "server_port": 8081,
+  "days_back": 10,
+  "default_language": "en",
+  "transcripts_dir": "transcripts",
+  "channels": [
+    {
+      "url": "https://www.youtube.com/@MarcoCasario",
+      "language": "it",
+      "html_summary_path": "GitHub/FINANCE/youtube/MarcoCasario"
+    },
+    {
+      "url": "https://www.youtube.com/@marcocasarioExtra",
+      "language": "it",
+      "html_summary_path": "GitHub/FINANCE/youtube/MarcoCasarioExtra"
+    },
+    {
+      "url": "https://www.youtube.com/@DrVitoZennaro",
+      "language": "it",
+      "html_summary_path": "GitHub/HEALTH/personal-health/massimo/health-goals/youtube/VitoZennaro"
+    },
+    {
+      "url": "https://www.youtube.com/@dottvaleriosolari",
+      "language": "it",
+      "html_summary_path": "GitHub/HEALTH/personal-health/massimo/health-goals/youtube/ValerioSolari"
+    },
+    {
+      "url": "https://www.youtube.com/@NateBJones",
+      "language": "en",
+      "html_summary_path": "GitHub/AI_companies/youtube/NateBJones"
+    }
+  ],
+  "videos": [
+    {
+      "title": "Top 10 Foods You Must Eat After 50 (Anti-Aging Benefits!)",
+      "url": "https://www.youtube.com/watch?v=ZkntfHTNi08",
+      "language": "en",
+      "html_summary_path": "GitHub/HEALTH/personal-health/massimo/health-goals/youtube/other"
+    }
+  ]
+}
