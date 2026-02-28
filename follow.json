@@ -3,6 +3,7 @@
     "mac": "/Volumes/cloud",
     "dxp8800": "/volume3/cloud",
     "docker": "/data",
+    "msi_edgexpert": "/Volumes/cloud",
     "nginx_base": "http://192.168.1.16:8080/shared3/cloud"
   },
   "api_base": "http://192.168.1.16:8081",

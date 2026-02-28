@@ -179,29 +179,89 @@
     border-radius: 3px;
     margin-top: 4px;
   }
+  /* Download Video form */
+  .download-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 24px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }
+  .download-form .form-group {
+    margin-bottom: 16px;
+  }
+  .download-form label {
+    display: block;
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .download-form select,
+  .download-form input[type="text"] {
+    width: 100%;
+    background: #0f0f0f;
+    color: #f1f1f1;
+    border: 1px solid #333;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  .download-form select:focus,
+  .download-form input[type="text"]:focus {
+    outline: none;
+    border-color: #ff4444;
+  }
+  .download-form .submit-btn {
+    background: #cc0000;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  .download-form .submit-btn:hover { background: #ff2222; }
+  .download-form .submit-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+  }
+  #custom-path-group {
+    display: none;
+    margin-top: 8px;
+  }
 </style>
 </head>
 <body>
 
 <h1>YouTube Follow - Latest Videos</h1>
-<p class="subtitle">Videos published in the last 10 days &bull; Generated 2026-02-26 03:09</p>
+<p class="subtitle">Videos published in the last 10 days &bull; Generated 2026-02-28 18:00</p>
+<p style="text-align:center;margin-bottom:16px">
+  <a href="http://192.168.1.16:8080/shared3/cloud/GitHub/YOUTUBE/summaries_index.html"
+     style="color:#6688ff;text-decoration:none;font-size:14px">
+     View All Summaries Index
+  </a>
+</p>
 
 <div class="filter-bar">
   <label for="channel-filter">Channel:</label>
   <select id="channel-filter" onchange="filterChannel()">
     <option value="">All Channels</option>
-    <option value="DrVitoZennaro">DrVitoZennaro</option><option value="MarcoCasario">MarcoCasario</option><option value="NateBJones">NateBJones</option><option value="dottvaleriosolari">dottvaleriosolari</option>
+    <option value="DrVitoZennaro">DrVitoZennaro</option><option value="MarcoCasario">MarcoCasario</option><option value="NateBJones">NateBJones</option><option value="dottvaleriosolari">dottvaleriosolari</option><option value="marcocasarioExtra">marcocasarioExtra</option>
   </select>
 </div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('latest')">Latest Videos</button>
   <button class="tab-btn" onclick="switchTab('downloaded')">Downloaded</button>
+  <button class="tab-btn" onclick="switchTab('download-video')">Download Video</button>
 </div>
 
 <!-- Latest Videos Tab -->
 <div id="tab-latest" class="tab-content active">
-<p class="stats">35 videos found</p>
+<p class="stats">41 videos found</p>
 <div class="table-container">
 <table>
 <thead>
@@ -217,7 +277,455 @@
 </thead>
 <tbody>
 
-        <tr id="row-0" data-channel="DrVitoZennaro">
+        <tr id="row-0" data-channel="dottvaleriosolari">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/ULDnvWdTK7I"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">dottvaleriosolari</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=ULDnvWdTK7I" target="_blank">Non buttare il TUORLO! 🥚 La verità su Uova e Colesterolo</a>
+          </td>
+          <td class="date-cell">02/28/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">1,696</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-0"
+                    data-url="https://www.youtube.com/watch?v=ULDnvWdTK7I"
+                    data-name="dottvaleriosolari-02282026-NonButtareIlTuorloLaVeritaSuUovaEColesterolo"
+                    data-lang="it"
+                    data-channel="dottvaleriosolari"
+                    data-title="Non buttare il TUORLO! 🥚 La verità su Uova e Colesterolo"
+                    data-date="20260228"
+                    data-views="1696"
+                    data-videoid="ULDnvWdTK7I"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-0"></span>
+          </td>
+        </tr>
+        <tr id="row-1" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/2ghhiPLg-jg"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=2ghhiPLg-jg" target="_blank">Schools Banned Calculators in 1975. They Were Wrong. Parents Banning AI Are Making the Same Mistake.</a>
+          </td>
+          <td class="date-cell">02/28/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">2,943</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-1"
+                    data-url="https://www.youtube.com/watch?v=2ghhiPLg-jg"
+                    data-name="NateBJones-02282026-SchoolsBannedCalculatorsIn1975TheyWereWrongParentsBanningAiA"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="Schools Banned Calculators in 1975. They Were Wrong. Parents Banning AI Are Making the Same Mistake."
+                    data-date="20260228"
+                    data-views="2943"
+                    data-videoid="2ghhiPLg-jg"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-1"></span>
+          </td>
+        </tr>
+        <tr id="row-2" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/m7r4iP2NqNc"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=m7r4iP2NqNc" target="_blank">ChatGPT convinced him he solved a million-dollar math problem #chatgpt #ai #deepmind</a>
+          </td>
+          <td class="date-cell">02/28/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">7,949</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-2"
+                    data-url="https://www.youtube.com/watch?v=m7r4iP2NqNc"
+                    data-name="NateBJones-02282026-ChatgptConvincedHimHeSolvedAMillionDollarMathProblemChatgptA"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="ChatGPT convinced him he solved a million-dollar math problem #chatgpt #ai #deepmind"
+                    data-date="20260228"
+                    data-views="7949"
+                    data-videoid="m7r4iP2NqNc"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-2"></span>
+          </td>
+        </tr>
+        <tr id="row-3" data-channel="marcocasarioExtra">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/efPL-S1hxp8"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">marcocasarioExtra</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=efPL-S1hxp8" target="_blank">Costruire un Portafoglio da ZERO in 4 Step: Il metodo che il 90% ignora</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">20,243</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-3"
+                    data-url="https://www.youtube.com/watch?v=efPL-S1hxp8"
+                    data-name="marcocasarioExtra-02272026-CostruireUnPortafoglioDaZeroIn4StepIlMetodoCheIl90Ignora"
+                    data-lang="it"
+                    data-channel="marcocasarioExtra"
+                    data-title="Costruire un Portafoglio da ZERO in 4 Step: Il metodo che il 90% ignora"
+                    data-date="20260227"
+                    data-views="20243"
+                    data-videoid="efPL-S1hxp8"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-3"></span>
+          </td>
+        </tr>
+        <tr id="row-4" data-channel="DrVitoZennaro">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/CBwG_4lqFTA"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">DrVitoZennaro</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=CBwG_4lqFTA" target="_blank">Mandare in remissione il diabete con una dieta a base di sola carne?</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">14,167</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-4"
+                    data-url="https://www.youtube.com/watch?v=CBwG_4lqFTA"
+                    data-name="DrVitoZennaro-02272026-MandareInRemissioneIlDiabeteConUnaDietaABaseDiSolaCarne"
+                    data-lang="it"
+                    data-channel="DrVitoZennaro"
+                    data-title="Mandare in remissione il diabete con una dieta a base di sola carne?"
+                    data-date="20260227"
+                    data-views="14167"
+                    data-videoid="CBwG_4lqFTA"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-4"></span>
+          </td>
+        </tr>
+        <tr id="row-5" data-channel="DrVitoZennaro">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/v0e-XT808L0"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">DrVitoZennaro</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=v0e-XT808L0" target="_blank">NON MANGIARLO! Il cibo più infiammatorio del fumo..</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">2,322</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-5"
+                    data-url="https://www.youtube.com/watch?v=v0e-XT808L0"
+                    data-name="DrVitoZennaro-02272026-NonMangiarloIlCiboPiuInfiammatorioDelFumo"
+                    data-lang="it"
+                    data-channel="DrVitoZennaro"
+                    data-title="NON MANGIARLO! Il cibo più infiammatorio del fumo.."
+                    data-date="20260227"
+                    data-views="2322"
+                    data-videoid="v0e-XT808L0"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-5"></span>
+          </td>
+        </tr>
+        <tr id="row-6" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/U5N9NvI_p8o"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=U5N9NvI_p8o" target="_blank">LLM psychosis is real and it&#x27;s coming to your workplace #deepmind #ai #llm</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">8,276</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-6"
+                    data-url="https://www.youtube.com/watch?v=U5N9NvI_p8o"
+                    data-name="NateBJones-02272026-LlmPsychosisIsRealAndItsComingToYourWorkplaceDeepmindAiLlm"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="LLM psychosis is real and it&#x27;s coming to your workplace #deepmind #ai #llm"
+                    data-date="20260227"
+                    data-views="8276"
+                    data-videoid="U5N9NvI_p8o"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-6"></span>
+          </td>
+        </tr>
+        <tr id="row-7" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/BpibZSMGtdY"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=BpibZSMGtdY" target="_blank">&#x27;Prompting&#x27; Just Split Into 4 Skills. You Only Know One. Here&#x27;s Why You Need the Other 3 in 2026.</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">65,578</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-7"
+                    data-url="https://www.youtube.com/watch?v=BpibZSMGtdY"
+                    data-name="NateBJones-02272026-PromptingJustSplitInto4SkillsYouOnlyKnowOneHeresWhyYouNeedTh"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="&#x27;Prompting&#x27; Just Split Into 4 Skills. You Only Know One. Here&#x27;s Why You Need the Other 3 in 2026."
+                    data-date="20260227"
+                    data-views="65578"
+                    data-videoid="BpibZSMGtdY"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-7"></span>
+          </td>
+        </tr>
+        <tr id="row-8" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/C_R8_Dd1x00"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=C_R8_Dd1x00" target="_blank">Anthropic&#x27;s AI strategy isn&#x27;t features — it&#x27;s surfaces #anthropic #ai #claude</a>
+          </td>
+          <td class="date-cell">02/27/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">11,195</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-8"
+                    data-url="https://www.youtube.com/watch?v=C_R8_Dd1x00"
+                    data-name="NateBJones-02272026-AnthropicsAiStrategyIsntFeaturesItsSurfacesAnthropicAiClaude"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="Anthropic&#x27;s AI strategy isn&#x27;t features — it&#x27;s surfaces #anthropic #ai #claude"
+                    data-date="20260227"
+                    data-views="11195"
+                    data-videoid="C_R8_Dd1x00"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-8"></span>
+          </td>
+        </tr>
+        <tr id="row-9" data-channel="MarcoCasario">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/OsdZ8hzmDPI"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">MarcoCasario</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=OsdZ8hzmDPI" target="_blank">La FINE degli Investimenti Passivi: la TASSA sugli UNREALIZED GAINS è una Realtà</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">82,714</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-9"
+                    data-url="https://www.youtube.com/watch?v=OsdZ8hzmDPI"
+                    data-name="MarcoCasario-02262026-LaFineDegliInvestimentiPassiviLaTassaSugliUnrealizedGainsEUn"
+                    data-lang="it"
+                    data-channel="MarcoCasario"
+                    data-title="La FINE degli Investimenti Passivi: la TASSA sugli UNREALIZED GAINS è una Realtà"
+                    data-date="20260226"
+                    data-views="82714"
+                    data-videoid="OsdZ8hzmDPI"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-9"></span>
+          </td>
+        </tr>
+        <tr id="row-10" data-channel="DrVitoZennaro">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/7GxRZWczLyk"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">DrVitoZennaro</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=7GxRZWczLyk" target="_blank">3 alimenti ricchissimi di vitamina C da includere nella tua dieta.</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">18,481</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-10"
+                    data-url="https://www.youtube.com/watch?v=7GxRZWczLyk"
+                    data-name="DrVitoZennaro-02262026-3AlimentiRicchissimiDiVitaminaCDaIncludereNellaTuaDieta"
+                    data-lang="it"
+                    data-channel="DrVitoZennaro"
+                    data-title="3 alimenti ricchissimi di vitamina C da includere nella tua dieta."
+                    data-date="20260226"
+                    data-views="18481"
+                    data-videoid="7GxRZWczLyk"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-10"></span>
+          </td>
+        </tr>
+        <tr id="row-11" data-channel="DrVitoZennaro">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/gEdmeuTy2JE"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">DrVitoZennaro</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=gEdmeuTy2JE" target="_blank">IL CIBO PIÙ ANTINFIAMMATORIO.. Aggiungilo alla tua dieta antinfiammatoria!</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">27,071</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-11"
+                    data-url="https://www.youtube.com/watch?v=gEdmeuTy2JE"
+                    data-name="DrVitoZennaro-02262026-IlCiboPiuAntinfiammatorioAggiungiloAllaTuaDietaAntinfiammato"
+                    data-lang="it"
+                    data-channel="DrVitoZennaro"
+                    data-title="IL CIBO PIÙ ANTINFIAMMATORIO.. Aggiungilo alla tua dieta antinfiammatoria!"
+                    data-date="20260226"
+                    data-views="27071"
+                    data-videoid="gEdmeuTy2JE"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-11"></span>
+          </td>
+        </tr>
+        <tr id="row-12" data-channel="dottvaleriosolari">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/8xHo1GKcDZ8"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">dottvaleriosolari</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=8xHo1GKcDZ8" target="_blank">Molecole non ancora in Italia? Te le svelo dal vivo a Napoli 🤫</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">2,893</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-12"
+                    data-url="https://www.youtube.com/watch?v=8xHo1GKcDZ8"
+                    data-name="dottvaleriosolari-02262026-MolecoleNonAncoraInItaliaTeLeSveloDalVivoANapoli"
+                    data-lang="it"
+                    data-channel="dottvaleriosolari"
+                    data-title="Molecole non ancora in Italia? Te le svelo dal vivo a Napoli 🤫"
+                    data-date="20260226"
+                    data-views="2893"
+                    data-videoid="8xHo1GKcDZ8"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-12"></span>
+          </td>
+        </tr>
+        <tr id="row-13" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/TZ_5GHNqOnw"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=TZ_5GHNqOnw" target="_blank">Claude Code now inspects your browser — here&#x27;s why it matters #claudecode #ai #agents</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">31,235</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-13"
+                    data-url="https://www.youtube.com/watch?v=TZ_5GHNqOnw"
+                    data-name="NateBJones-02262026-ClaudeCodeNowInspectsYourBrowserHeresWhyItMattersClaudecodeA"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="Claude Code now inspects your browser — here&#x27;s why it matters #claudecode #ai #agents"
+                    data-date="20260226"
+                    data-views="31235"
+                    data-videoid="TZ_5GHNqOnw"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-13"></span>
+          </td>
+        </tr>
+        <tr id="row-14" data-channel="NateBJones">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/q6pbQ5li5Cg"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">NateBJones</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=q6pbQ5li5Cg" target="_blank">Don&#x27;t Fall For the Stock Market Hype. The $7,000 Raise AI Is Giving You (That Nobody Mentions)</a>
+          </td>
+          <td class="date-cell">02/26/2026</td>
+          <td class="lang-cell">en</td>
+          <td class="views-cell">54,789</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-14"
+                    data-url="https://www.youtube.com/watch?v=q6pbQ5li5Cg"
+                    data-name="NateBJones-02262026-DontFallForTheStockMarketHypeThe7000RaiseAiIsGivingYouThatNo"
+                    data-lang="en"
+                    data-channel="NateBJones"
+                    data-title="Don&#x27;t Fall For the Stock Market Hype. The $7,000 Raise AI Is Giving You (That Nobody Mentions)"
+                    data-date="20260226"
+                    data-views="54789"
+                    data-videoid="q6pbQ5li5Cg"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-14"></span>
+          </td>
+        </tr>
+        <tr id="row-15" data-channel="marcocasarioExtra">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/vpfud60nIlo"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">marcocasarioExtra</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=vpfud60nIlo" target="_blank">Nessuno ci sta capendo NIENTE: i 6 Segnali di ALLARME</a>
+          </td>
+          <td class="date-cell">02/25/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">37,602</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-15"
+                    data-url="https://www.youtube.com/watch?v=vpfud60nIlo"
+                    data-name="marcocasarioExtra-02252026-NessunoCiStaCapendoNienteI6SegnaliDiAllarme"
+                    data-lang="it"
+                    data-channel="marcocasarioExtra"
+                    data-title="Nessuno ci sta capendo NIENTE: i 6 Segnali di ALLARME"
+                    data-date="20260225"
+                    data-views="37602"
+                    data-videoid="vpfud60nIlo"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-15"></span>
+          </td>
+        </tr>
+        <tr id="row-16" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/nDuGCySekBI"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -228,24 +736,24 @@
           </td>
           <td class="date-cell">02/25/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">10,747</td>
+          <td class="views-cell">66,277</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-0"
+            <button class="dl-btn" id="btn-16"
                     data-url="https://www.youtube.com/watch?v=nDuGCySekBI"
                     data-name="DrVitoZennaro-02252026-MangiareCarneNonESbagliato"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Mangiare carne non è SBAGLIATO."
                     data-date="20260225"
-                    data-views="10747"
+                    data-views="66277"
                     data-videoid="nDuGCySekBI"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-0"></span>
+            <span class="status" id="status-16"></span>
           </td>
         </tr>
-        <tr id="row-1" data-channel="NateBJones">
+        <tr id="row-17" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/0v9ixCWNhPo"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -256,52 +764,24 @@
           </td>
           <td class="date-cell">02/25/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">55,995</td>
+          <td class="views-cell">85,401</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-1"
+            <button class="dl-btn" id="btn-17"
                     data-url="https://www.youtube.com/watch?v=0v9ixCWNhPo"
                     data-name="NateBJones-02252026-ThreeLabsJustStoleClaudesBrainHeresWhatItBrokeAndWhyYouShoul"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Three Labs Just Stole Claude&#x27;s Brain. Here&#x27;s What It Broke (And Why You Should Care)"
                     data-date="20260225"
-                    data-views="55995"
+                    data-views="85401"
                     data-videoid="0v9ixCWNhPo"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-1"></span>
+            <span class="status" id="status-17"></span>
           </td>
         </tr>
-        <tr id="row-2" data-channel="MarcoCasario">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/cil3676hDNI"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">MarcoCasario</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=cil3676hDNI" target="_blank">Perché i GOVERNI hanno DEBITI enormi? </a>
-          </td>
-          <td class="date-cell">02/24/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">29,110</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-2"
-                    data-url="https://www.youtube.com/watch?v=cil3676hDNI"
-                    data-name="MarcoCasario-02242026-PercheIGoverniHannoDebitiEnormi"
-                    data-lang="it"
-                    data-channel="MarcoCasario"
-                    data-title="Perché i GOVERNI hanno DEBITI enormi? "
-                    data-date="20260224"
-                    data-views="29110"
-                    data-videoid="cil3676hDNI"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-2"></span>
-          </td>
-        </tr>
-        <tr id="row-3" data-channel="DrVitoZennaro">
+        <tr id="row-18" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/L5spM-rOTRU"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -312,24 +792,24 @@
           </td>
           <td class="date-cell">02/24/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">19,424</td>
+          <td class="views-cell">23,766</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-3"
+            <button class="dl-btn" id="btn-18"
                     data-url="https://www.youtube.com/watch?v=L5spM-rOTRU"
                     data-name="DrVitoZennaro-02242026-OlioDiCoccoSiONoDipendeDaComeLoGuardi"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Olio di cocco: sì o no? Dipende da come lo guardi."
                     data-date="20260224"
-                    data-views="19424"
+                    data-views="23766"
                     data-videoid="L5spM-rOTRU"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-3"></span>
+            <span class="status" id="status-18"></span>
           </td>
         </tr>
-        <tr id="row-4" data-channel="DrVitoZennaro">
+        <tr id="row-19" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/oJ5u2rUvMSs"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -340,24 +820,24 @@
           </td>
           <td class="date-cell">02/24/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">2,700</td>
+          <td class="views-cell">3,184</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-4"
+            <button class="dl-btn" id="btn-19"
                     data-url="https://www.youtube.com/watch?v=oJ5u2rUvMSs"
                     data-name="DrVitoZennaro-02242026-BastaZuccheroPer14GiorniCosaSuccedeDavveroAlTuoCorpoEIBenefi"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="BASTA ZUCCHERO PER 14 GIORNI..Cosa succede davvero al tuo corpo e i benefici."
                     data-date="20260224"
-                    data-views="2700"
+                    data-views="3184"
                     data-videoid="oJ5u2rUvMSs"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-4"></span>
+            <span class="status" id="status-19"></span>
           </td>
         </tr>
-        <tr id="row-5" data-channel="NateBJones">
+        <tr id="row-20" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/QWzLPn164w0"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -368,24 +848,24 @@
           </td>
           <td class="date-cell">02/24/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">106,027</td>
+          <td class="views-cell">125,220</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-5"
+            <button class="dl-btn" id="btn-20"
                     data-url="https://www.youtube.com/watch?v=QWzLPn164w0"
                     data-name="NateBJones-02242026-PromptEngineeringIsDeadContextEngineeringIsDyingWhatComesNex"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Prompt Engineering Is Dead. Context Engineering Is Dying. What Comes Next Changes Everything."
                     data-date="20260224"
-                    data-views="106027"
+                    data-views="125220"
                     data-videoid="QWzLPn164w0"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-5"></span>
+            <span class="status" id="status-20"></span>
           </td>
         </tr>
-        <tr id="row-6" data-channel="MarcoCasario">
+        <tr id="row-21" data-channel="MarcoCasario">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/9LUBAbK9NKY"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -396,24 +876,52 @@
           </td>
           <td class="date-cell">02/23/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">45,320</td>
+          <td class="views-cell">47,370</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-6"
+            <button class="dl-btn" id="btn-21"
                     data-url="https://www.youtube.com/watch?v=9LUBAbK9NKY"
                     data-name="MarcoCasario-02232026-IDaziSonoIllegaliTrumpEDisarmatoOraELeMinacceNonFunzionanoPi"
                     data-lang="it"
                     data-channel="MarcoCasario"
                     data-title="I DAZI sono ILLEGALI: Trump è DISARMATO ora (e le MINACCE non funzionano piu)"
                     data-date="20260223"
-                    data-views="45320"
+                    data-views="47370"
                     data-videoid="9LUBAbK9NKY"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-6"></span>
+            <span class="status" id="status-21"></span>
           </td>
         </tr>
-        <tr id="row-7" data-channel="DrVitoZennaro">
+        <tr id="row-22" data-channel="marcocasarioExtra">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/AuRrshwcXQs"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">marcocasarioExtra</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=AuRrshwcXQs" target="_blank">La nuova ERA dell&#x27;economia USA: Dazi Illegali e Deregolamentazione Bancaria</a>
+          </td>
+          <td class="date-cell">02/23/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">14,339</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-22"
+                    data-url="https://www.youtube.com/watch?v=AuRrshwcXQs"
+                    data-name="marcocasarioExtra-02232026-LaNuovaEraDelleconomiaUsaDaziIllegaliEDeregolamentazioneBanc"
+                    data-lang="it"
+                    data-channel="marcocasarioExtra"
+                    data-title="La nuova ERA dell&#x27;economia USA: Dazi Illegali e Deregolamentazione Bancaria"
+                    data-date="20260223"
+                    data-views="14339"
+                    data-videoid="AuRrshwcXQs"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-22"></span>
+          </td>
+        </tr>
+        <tr id="row-23" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/IpSiP7r5ocM"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -424,52 +932,52 @@
           </td>
           <td class="date-cell">02/23/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">13,910</td>
+          <td class="views-cell">15,904</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-7"
+            <button class="dl-btn" id="btn-23"
                     data-url="https://www.youtube.com/watch?v=IpSiP7r5ocM"
                     data-name="DrVitoZennaro-02232026-3ModiInfallibiliPerDistruggereIlTuoIntestino"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="3 modi infallibili per distruggere il tuo intestino."
                     data-date="20260223"
-                    data-views="13910"
+                    data-views="15904"
                     data-videoid="IpSiP7r5ocM"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-7"></span>
+            <span class="status" id="status-23"></span>
           </td>
         </tr>
-        <tr id="row-8" data-channel="dottvaleriosolari">
+        <tr id="row-24" data-channel="dottvaleriosolari">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/OSqzwfGLQ30"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
           </td>
           <td class="channel-cell">dottvaleriosolari</td>
           <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=OSqzwfGLQ30" target="_blank">La “Vitamina Fantasma” che riaccende cervello ed energia (Senza farmaci)</a>
+            <a href="https://www.youtube.com/watch?v=OSqzwfGLQ30" target="_blank">La Vitamina &#x27;Fantasma&#x27; che Dovresti Assumere Ogni Mattina</a>
           </td>
           <td class="date-cell">02/23/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">11,450</td>
+          <td class="views-cell">13,229</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-8"
+            <button class="dl-btn" id="btn-24"
                     data-url="https://www.youtube.com/watch?v=OSqzwfGLQ30"
-                    data-name="dottvaleriosolari-02232026-LaVitaminaFantasmaCheRiaccendeCervelloEdEnergiaSenzaFarmaci"
+                    data-name="dottvaleriosolari-02232026-LaVitaminaFantasmaCheDovrestiAssumereOgniMattina"
                     data-lang="it"
                     data-channel="dottvaleriosolari"
-                    data-title="La “Vitamina Fantasma” che riaccende cervello ed energia (Senza farmaci)"
+                    data-title="La Vitamina &#x27;Fantasma&#x27; che Dovresti Assumere Ogni Mattina"
                     data-date="20260223"
-                    data-views="11450"
+                    data-views="13229"
                     data-videoid="OSqzwfGLQ30"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-8"></span>
+            <span class="status" id="status-24"></span>
           </td>
         </tr>
-        <tr id="row-9" data-channel="NateBJones">
+        <tr id="row-25" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/8jKAT8GNDE0"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -480,24 +988,24 @@
           </td>
           <td class="date-cell">02/23/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">194,939</td>
+          <td class="views-cell">217,970</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-9"
+            <button class="dl-btn" id="btn-25"
                     data-url="https://www.youtube.com/watch?v=8jKAT8GNDE0"
                     data-name="NateBJones-02232026-GooglesNewAiIsSmarterThanEveryonesButItCostsHalfAsMuchHeresW"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Google&#x27;s New AI Is Smarter Than Everyone&#x27;s But It Costs HALF as Much. Here&#x27;s Why They Don&#x27;t Care."
                     data-date="20260223"
-                    data-views="194939"
+                    data-views="217970"
                     data-videoid="8jKAT8GNDE0"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-9"></span>
+            <span class="status" id="status-25"></span>
           </td>
         </tr>
-        <tr id="row-10" data-channel="DrVitoZennaro">
+        <tr id="row-26" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/iA55Susfsvs"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -508,24 +1016,24 @@
           </td>
           <td class="date-cell">02/22/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">10,474</td>
+          <td class="views-cell">11,270</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-10"
+            <button class="dl-btn" id="btn-26"
                     data-url="https://www.youtube.com/watch?v=iA55Susfsvs"
                     data-name="DrVitoZennaro-02222026-AlimentazioneSanaPerIGiovaniMangiaresanoBenesserenaturaleSal"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Alimentazione sana per i giovani #mangiaresano #benesserenaturale #salute #dieta #dietasana"
                     data-date="20260222"
-                    data-views="10474"
+                    data-views="11270"
                     data-videoid="iA55Susfsvs"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-10"></span>
+            <span class="status" id="status-26"></span>
           </td>
         </tr>
-        <tr id="row-11" data-channel="DrVitoZennaro">
+        <tr id="row-27" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/Ip6vZR0Fx6Q"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -536,24 +1044,24 @@
           </td>
           <td class="date-cell">02/22/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">35,162</td>
+          <td class="views-cell">38,115</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-11"
+            <button class="dl-btn" id="btn-27"
                     data-url="https://www.youtube.com/watch?v=Ip6vZR0Fx6Q"
                     data-name="DrVitoZennaro-02222026-PrendiVitaminaCPerSostenereIlSistemaImmunitario"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Prendi vitamina C per sostenere il sistema immunitario?"
                     data-date="20260222"
-                    data-views="35162"
+                    data-views="38115"
                     data-videoid="Ip6vZR0Fx6Q"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-11"></span>
+            <span class="status" id="status-27"></span>
           </td>
         </tr>
-        <tr id="row-12" data-channel="DrVitoZennaro">
+        <tr id="row-28" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/nVK5fqqSW1k"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -564,24 +1072,24 @@
           </td>
           <td class="date-cell">02/22/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">8,259</td>
+          <td class="views-cell">8,696</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-12"
+            <button class="dl-btn" id="btn-28"
                     data-url="https://www.youtube.com/watch?v=nVK5fqqSW1k"
                     data-name="DrVitoZennaro-02222026-5SintomiDaCarenzaDiVitamineENutrientiISegnaliDelTuoCorpo"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="5 SINTOMI da carenza di vitamine e nutrienti. I segnali del tuo corpo."
                     data-date="20260222"
-                    data-views="8259"
+                    data-views="8696"
                     data-videoid="nVK5fqqSW1k"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-12"></span>
+            <span class="status" id="status-28"></span>
           </td>
         </tr>
-        <tr id="row-13" data-channel="dottvaleriosolari">
+        <tr id="row-29" data-channel="dottvaleriosolari">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/5oQnDBxUcBo"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -592,24 +1100,24 @@
           </td>
           <td class="date-cell">02/22/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">9,632</td>
+          <td class="views-cell">12,513</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-13"
+            <button class="dl-btn" id="btn-29"
                     data-url="https://www.youtube.com/watch?v=5oQnDBxUcBo"
                     data-name="dottvaleriosolari-02222026-21MarzoUnaGiornataCheCambieraIlTuoModoDiInvecchiare"
                     data-lang="it"
                     data-channel="dottvaleriosolari"
                     data-title="21 Marzo: Una giornata che cambierà il tuo modo di invecchiare 📅"
                     data-date="20260222"
-                    data-views="9632"
+                    data-views="12513"
                     data-videoid="5oQnDBxUcBo"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-13"></span>
+            <span class="status" id="status-29"></span>
           </td>
         </tr>
-        <tr id="row-14" data-channel="NateBJones">
+        <tr id="row-30" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/OMb5oTlC_q0"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -620,24 +1128,24 @@
           </td>
           <td class="date-cell">02/22/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">77,533</td>
+          <td class="views-cell">79,308</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-14"
+            <button class="dl-btn" id="btn-30"
                     data-url="https://www.youtube.com/watch?v=OMb5oTlC_q0"
                     data-name="NateBJones-02222026-AnthropicTested16ModelsInstructionsDidntStopThemWhenSecurity"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Anthropic Tested 16 Models. Instructions Didn&#x27;t Stop Them (When Security is a Structural Failure)"
                     data-date="20260222"
-                    data-views="77533"
+                    data-views="79308"
                     data-videoid="OMb5oTlC_q0"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-14"></span>
+            <span class="status" id="status-30"></span>
           </td>
         </tr>
-        <tr id="row-15" data-channel="DrVitoZennaro">
+        <tr id="row-31" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/62Wt6wBv4fY"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -648,24 +1156,24 @@
           </td>
           <td class="date-cell">02/21/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">5,814</td>
+          <td class="views-cell">6,225</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-15"
+            <button class="dl-btn" id="btn-31"
                     data-url="https://www.youtube.com/watch?v=62Wt6wBv4fY"
                     data-name="DrVitoZennaro-02212026-SaiCheNegliUltimiAnniGliStatiUnitiHannoAnnunciatoLIntenzione"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Sai che negli ultimi anni gli Stati Uniti hanno annunciato l’intenzione di lasciare OMS"
                     data-date="20260221"
-                    data-views="5814"
+                    data-views="6225"
                     data-videoid="62Wt6wBv4fY"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-15"></span>
+            <span class="status" id="status-31"></span>
           </td>
         </tr>
-        <tr id="row-16" data-channel="NateBJones">
+        <tr id="row-32" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/O-0poNv2jD4"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -676,24 +1184,52 @@
           </td>
           <td class="date-cell">02/21/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">151,451</td>
+          <td class="views-cell">156,302</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-16"
+            <button class="dl-btn" id="btn-32"
                     data-url="https://www.youtube.com/watch?v=O-0poNv2jD4"
                     data-name="NateBJones-02212026-The285bSellOffWasJustTheBeginningTheInfrastructureStoryIsBig"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="The $285B Sell-Off Was Just the Beginning — The Infrastructure Story Is Bigger."
                     data-date="20260221"
-                    data-views="151451"
+                    data-views="156302"
                     data-videoid="O-0poNv2jD4"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-16"></span>
+            <span class="status" id="status-32"></span>
           </td>
         </tr>
-        <tr id="row-17" data-channel="DrVitoZennaro">
+        <tr id="row-33" data-channel="marcocasarioExtra">
+          <td class="video-cell">
+            <iframe width="280" height="158" src="https://www.youtube.com/embed/4xrdOHXY4Yw"
+                    frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </td>
+          <td class="channel-cell">marcocasarioExtra</td>
+          <td class="title-cell">
+            <a href="https://www.youtube.com/watch?v=4xrdOHXY4Yw" target="_blank">Il Caso BAYER e il Risk Management del Portafoglio</a>
+          </td>
+          <td class="date-cell">02/20/2026</td>
+          <td class="lang-cell">it</td>
+          <td class="views-cell">15,395</td>
+          <td class="action-cell">
+            <button class="dl-btn" id="btn-33"
+                    data-url="https://www.youtube.com/watch?v=4xrdOHXY4Yw"
+                    data-name="marcocasarioExtra-02202026-IlCasoBayerEIlRiskManagementDelPortafoglio"
+                    data-lang="it"
+                    data-channel="marcocasarioExtra"
+                    data-title="Il Caso BAYER e il Risk Management del Portafoglio"
+                    data-date="20260220"
+                    data-views="15395"
+                    data-videoid="4xrdOHXY4Yw"
+                    onclick="downloadTranscript(this)">
+              Download Transcript
+            </button>
+            <span class="status" id="status-33"></span>
+          </td>
+        </tr>
+        <tr id="row-34" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/L1104r_FdsY"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -704,24 +1240,24 @@
           </td>
           <td class="date-cell">02/20/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">38,063</td>
+          <td class="views-cell">42,677</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-17"
+            <button class="dl-btn" id="btn-34"
                     data-url="https://www.youtube.com/watch?v=L1104r_FdsY"
                     data-name="DrVitoZennaro-02202026-AttenzioneISalumiSonoCancerogeni"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="“Attenzione: i salumi sono cancerogeni.”"
                     data-date="20260220"
-                    data-views="38063"
+                    data-views="42677"
                     data-videoid="L1104r_FdsY"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-17"></span>
+            <span class="status" id="status-34"></span>
           </td>
         </tr>
-        <tr id="row-18" data-channel="DrVitoZennaro">
+        <tr id="row-35" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/wkxx7_lJaM8"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -732,24 +1268,24 @@
           </td>
           <td class="date-cell">02/20/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">20,611</td>
+          <td class="views-cell">22,673</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-18"
+            <button class="dl-btn" id="btn-35"
                     data-url="https://www.youtube.com/watch?v=wkxx7_lJaM8"
                     data-name="DrVitoZennaro-02202026-MaiPiuPastaNelPiattoCosaSuccedeAlTuoCorpoSeSmettiDiMangiarel"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="MAI PIÙ PASTA NEL PIATTO! Cosa succede al tuo corpo se smetti di mangiarela?"
                     data-date="20260220"
-                    data-views="20611"
+                    data-views="22673"
                     data-videoid="wkxx7_lJaM8"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-18"></span>
+            <span class="status" id="status-35"></span>
           </td>
         </tr>
-        <tr id="row-19" data-channel="NateBJones">
+        <tr id="row-36" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/-bQcWs1Z9a0"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -760,24 +1296,24 @@
           </td>
           <td class="date-cell">02/20/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">84,793</td>
+          <td class="views-cell">87,100</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-19"
+            <button class="dl-btn" id="btn-36"
                     data-url="https://www.youtube.com/watch?v=-bQcWs1Z9a0"
                     data-name="NateBJones-02202026-1000ADayInAiCostsThreeEngineersNoWritingCodeNoCodeReviewButM"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="$1,000 a Day in AI Costs. Three Engineers. No Writing Code. No Code Review. But More Output."
                     data-date="20260220"
-                    data-views="84793"
+                    data-views="87100"
                     data-videoid="-bQcWs1Z9a0"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-19"></span>
+            <span class="status" id="status-36"></span>
           </td>
         </tr>
-        <tr id="row-20" data-channel="NateBJones">
+        <tr id="row-37" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/_ykT_l4e8F8"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -788,24 +1324,24 @@
           </td>
           <td class="date-cell">02/20/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">19,033</td>
+          <td class="views-cell">20,643</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-20"
+            <button class="dl-btn" id="btn-37"
                     data-url="https://www.youtube.com/watch?v=_ykT_l4e8F8"
                     data-name="NateBJones-02202026-WhyCodexLetsYouHandOffAiCodingAndWalkAwayAiCodexFutureofwork"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Why Codex lets you hand off AI coding and walk away #ai #codex #futureofwork"
                     data-date="20260220"
-                    data-views="19033"
+                    data-views="20643"
                     data-videoid="_ykT_l4e8F8"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-20"></span>
+            <span class="status" id="status-37"></span>
           </td>
         </tr>
-        <tr id="row-21" data-channel="DrVitoZennaro">
+        <tr id="row-38" data-channel="DrVitoZennaro">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/gyHRfurpEXo"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -816,52 +1352,24 @@
           </td>
           <td class="date-cell">02/19/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">37,406</td>
+          <td class="views-cell">39,874</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-21"
+            <button class="dl-btn" id="btn-38"
                     data-url="https://www.youtube.com/watch?v=gyHRfurpEXo"
                     data-name="DrVitoZennaro-02192026-TiDo3RagioniPerCuiHaSensoLimitareLaCotturaNelMicroonde"
                     data-lang="it"
                     data-channel="DrVitoZennaro"
                     data-title="Ti do 3 ragioni per cui ha senso limitare la cottura nel microonde."
                     data-date="20260219"
-                    data-views="37406"
+                    data-views="39874"
                     data-videoid="gyHRfurpEXo"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-21"></span>
+            <span class="status" id="status-38"></span>
           </td>
         </tr>
-        <tr id="row-22" data-channel="DrVitoZennaro">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/aVl9aDzWBRs"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">DrVitoZennaro</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=aVl9aDzWBRs" target="_blank">Come STURARE le tue arterie in modo naturale..</a>
-          </td>
-          <td class="date-cell">02/19/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">26,559</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-22"
-                    data-url="https://www.youtube.com/watch?v=aVl9aDzWBRs"
-                    data-name="DrVitoZennaro-02192026-ComeSturareLeTueArterieInModoNaturale"
-                    data-lang="it"
-                    data-channel="DrVitoZennaro"
-                    data-title="Come STURARE le tue arterie in modo naturale.."
-                    data-date="20260219"
-                    data-views="26559"
-                    data-videoid="aVl9aDzWBRs"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-22"></span>
-          </td>
-        </tr>
-        <tr id="row-23" data-channel="dottvaleriosolari">
+        <tr id="row-39" data-channel="dottvaleriosolari">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/Jn9BgZUszJw"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -872,24 +1380,24 @@
           </td>
           <td class="date-cell">02/19/2026</td>
           <td class="lang-cell">it</td>
-          <td class="views-cell">164,059</td>
+          <td class="views-cell">174,765</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-23"
+            <button class="dl-btn" id="btn-39"
                     data-url="https://www.youtube.com/watch?v=Jn9BgZUszJw"
                     data-name="dottvaleriosolari-02192026-IlCollutorioDistruggeIlTuoCuore"
                     data-lang="it"
                     data-channel="dottvaleriosolari"
                     data-title="Il Collutorio Distrugge il Tuo Cuore? 🫀"
                     data-date="20260219"
-                    data-views="164059"
+                    data-views="174765"
                     data-videoid="Jn9BgZUszJw"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-23"></span>
+            <span class="status" id="status-39"></span>
           </td>
         </tr>
-        <tr id="row-24" data-channel="NateBJones">
+        <tr id="row-40" data-channel="NateBJones">
           <td class="video-cell">
             <iframe width="280" height="158" src="https://www.youtube.com/embed/bySRD8jSoAw"
                     frameborder="0" allowfullscreen loading="lazy"></iframe>
@@ -900,301 +1408,21 @@
           </td>
           <td class="date-cell">02/19/2026</td>
           <td class="lang-cell">en</td>
-          <td class="views-cell">21,629</td>
+          <td class="views-cell">23,384</td>
           <td class="action-cell">
-            <button class="dl-btn" id="btn-24"
+            <button class="dl-btn" id="btn-40"
                     data-url="https://www.youtube.com/watch?v=bySRD8jSoAw"
                     data-name="NateBJones-02192026-WhyCodexBeatsEveryAiMeetingNotesToolAiCodexFutureofwork"
                     data-lang="en"
                     data-channel="NateBJones"
                     data-title="Why Codex beats every AI meeting notes tool #ai #codex #futureofwork"
                     data-date="20260219"
-                    data-views="21629"
+                    data-views="23384"
                     data-videoid="bySRD8jSoAw"
                     onclick="downloadTranscript(this)">
               Download Transcript
             </button>
-            <span class="status" id="status-24"></span>
-          </td>
-        </tr>
-        <tr id="row-25" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/6r0UeMQE66I"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=6r0UeMQE66I" target="_blank">Why the Biggest AI Career Opportunity Just Appeared—and Almost Nobody Sees It.</a>
-          </td>
-          <td class="date-cell">02/19/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">121,166</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-25"
-                    data-url="https://www.youtube.com/watch?v=6r0UeMQE66I"
-                    data-name="NateBJones-02192026-WhyTheBiggestAiCareerOpportunityJustAppearedAndAlmostNobodyS"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="Why the Biggest AI Career Opportunity Just Appeared—and Almost Nobody Sees It."
-                    data-date="20260219"
-                    data-views="121166"
-                    data-videoid="6r0UeMQE66I"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-25"></span>
-          </td>
-        </tr>
-        <tr id="row-26" data-channel="DrVitoZennaro">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/Ocr8dfvqh8k"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">DrVitoZennaro</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=Ocr8dfvqh8k" target="_blank">Sai che la frittata è uno dei modi peggiori per cucinare le uova?</a>
-          </td>
-          <td class="date-cell">02/18/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">59,141</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-26"
-                    data-url="https://www.youtube.com/watch?v=Ocr8dfvqh8k"
-                    data-name="DrVitoZennaro-02182026-SaiCheLaFrittataEUnoDeiModiPeggioriPerCucinareLeUova"
-                    data-lang="it"
-                    data-channel="DrVitoZennaro"
-                    data-title="Sai che la frittata è uno dei modi peggiori per cucinare le uova?"
-                    data-date="20260218"
-                    data-views="59141"
-                    data-videoid="Ocr8dfvqh8k"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-26"></span>
-          </td>
-        </tr>
-        <tr id="row-27" data-channel="DrVitoZennaro">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/NkXp9VXHWEg"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">DrVitoZennaro</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=NkXp9VXHWEg" target="_blank">I VERI PROBLEMI della dieta del gruppo sanguigno...</a>
-          </td>
-          <td class="date-cell">02/18/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">4,871</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-27"
-                    data-url="https://www.youtube.com/watch?v=NkXp9VXHWEg"
-                    data-name="DrVitoZennaro-02182026-IVeriProblemiDellaDietaDelGruppoSanguigno"
-                    data-lang="it"
-                    data-channel="DrVitoZennaro"
-                    data-title="I VERI PROBLEMI della dieta del gruppo sanguigno..."
-                    data-date="20260218"
-                    data-views="4871"
-                    data-videoid="NkXp9VXHWEg"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-27"></span>
-          </td>
-        </tr>
-        <tr id="row-28" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/1IKMlKEGt3U"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=1IKMlKEGt3U" target="_blank">Sam Altman admits OpenAI can&#x27;t keep up with demand #chatgpt #ai #futureofwork</a>
-          </td>
-          <td class="date-cell">02/18/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">28,534</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-28"
-                    data-url="https://www.youtube.com/watch?v=1IKMlKEGt3U"
-                    data-name="NateBJones-02182026-SamAltmanAdmitsOpenaiCantKeepUpWithDemandChatgptAiFutureofwo"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="Sam Altman admits OpenAI can&#x27;t keep up with demand #chatgpt #ai #futureofwork"
-                    data-date="20260218"
-                    data-views="28534"
-                    data-videoid="1IKMlKEGt3U"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-28"></span>
-          </td>
-        </tr>
-        <tr id="row-29" data-channel="DrVitoZennaro">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/wNvPfplnjZg"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">DrVitoZennaro</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=wNvPfplnjZg" target="_blank">3 ragioni per cui in inverno ha senso limitare la frutta.</a>
-          </td>
-          <td class="date-cell">02/17/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">32,466</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-29"
-                    data-url="https://www.youtube.com/watch?v=wNvPfplnjZg"
-                    data-name="DrVitoZennaro-02172026-3RagioniPerCuiInInvernoHaSensoLimitareLaFrutta"
-                    data-lang="it"
-                    data-channel="DrVitoZennaro"
-                    data-title="3 ragioni per cui in inverno ha senso limitare la frutta."
-                    data-date="20260217"
-                    data-views="32466"
-                    data-videoid="wNvPfplnjZg"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-29"></span>
-          </td>
-        </tr>
-        <tr id="row-30" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/CNI6rV5Mrn4"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=CNI6rV5Mrn4" target="_blank">Why OpenAI is selling seats, not software #chatgpt #ai #futureofwork</a>
-          </td>
-          <td class="date-cell">02/17/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">10,979</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-30"
-                    data-url="https://www.youtube.com/watch?v=CNI6rV5Mrn4"
-                    data-name="NateBJones-02172026-WhyOpenaiIsSellingSeatsNotSoftwareChatgptAiFutureofwork"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="Why OpenAI is selling seats, not software #chatgpt #ai #futureofwork"
-                    data-date="20260217"
-                    data-views="10979"
-                    data-videoid="CNI6rV5Mrn4"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-30"></span>
-          </td>
-        </tr>
-        <tr id="row-31" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/5IzPLjqkFaE"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=5IzPLjqkFaE" target="_blank">The OpenClaw Saga: Zuckerberg Begged This Developer to Join Meta. He Said No. Here&#x27;s Who Got Him.</a>
-          </td>
-          <td class="date-cell">02/17/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">102,888</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-31"
-                    data-url="https://www.youtube.com/watch?v=5IzPLjqkFaE"
-                    data-name="NateBJones-02172026-TheOpenclawSagaZuckerbergBeggedThisDeveloperToJoinMetaHeSaid"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="The OpenClaw Saga: Zuckerberg Begged This Developer to Join Meta. He Said No. Here&#x27;s Who Got Him."
-                    data-date="20260217"
-                    data-views="102888"
-                    data-videoid="5IzPLjqkFaE"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-31"></span>
-          </td>
-        </tr>
-        <tr id="row-32" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/2P-fNgoENlw"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=2P-fNgoENlw" target="_blank">The entropy crisis AI was built to solve (humans can&#x27;t)</a>
-          </td>
-          <td class="date-cell">02/17/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">13,478</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-32"
-                    data-url="https://www.youtube.com/watch?v=2P-fNgoENlw"
-                    data-name="NateBJones-02172026-TheEntropyCrisisAiWasBuiltToSolveHumansCant"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="The entropy crisis AI was built to solve (humans can&#x27;t)"
-                    data-date="20260217"
-                    data-views="13478"
-                    data-videoid="2P-fNgoENlw"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-32"></span>
-          </td>
-        </tr>
-        <tr id="row-33" data-channel="MarcoCasario">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/K4qqZnYYMXU"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">MarcoCasario</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=K4qqZnYYMXU" target="_blank">Un Mercato UNICO Europeo: solo cosi l&#x27;EU si puo&#x27; SALVARE dal FALLIMENTO</a>
-          </td>
-          <td class="date-cell">02/16/2026</td>
-          <td class="lang-cell">it</td>
-          <td class="views-cell">44,386</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-33"
-                    data-url="https://www.youtube.com/watch?v=K4qqZnYYMXU"
-                    data-name="MarcoCasario-02162026-UnMercatoUnicoEuropeoSoloCosiLeuSiPuoSalvareDalFallimento"
-                    data-lang="it"
-                    data-channel="MarcoCasario"
-                    data-title="Un Mercato UNICO Europeo: solo cosi l&#x27;EU si puo&#x27; SALVARE dal FALLIMENTO"
-                    data-date="20260216"
-                    data-views="44386"
-                    data-videoid="K4qqZnYYMXU"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-33"></span>
-          </td>
-        </tr>
-        <tr id="row-34" data-channel="NateBJones">
-          <td class="video-cell">
-            <iframe width="280" height="158" src="https://www.youtube.com/embed/41UDGsBEjoI"
-                    frameborder="0" allowfullscreen loading="lazy"></iframe>
-          </td>
-          <td class="channel-cell">NateBJones</td>
-          <td class="title-cell">
-            <a href="https://www.youtube.com/watch?v=41UDGsBEjoI" target="_blank">Codex 5.3 vs Opus 4.6: The Benchmark Nobody Expected. (How to STOP Picking the Wrong Agent)</a>
-          </td>
-          <td class="date-cell">02/16/2026</td>
-          <td class="lang-cell">en</td>
-          <td class="views-cell">74,974</td>
-          <td class="action-cell">
-            <button class="dl-btn" id="btn-34"
-                    data-url="https://www.youtube.com/watch?v=41UDGsBEjoI"
-                    data-name="NateBJones-02162026-Codex53VsOpus46TheBenchmarkNobodyExpectedHowToStopPickingThe"
-                    data-lang="en"
-                    data-channel="NateBJones"
-                    data-title="Codex 5.3 vs Opus 4.6: The Benchmark Nobody Expected. (How to STOP Picking the Wrong Agent)"
-                    data-date="20260216"
-                    data-views="74974"
-                    data-videoid="41UDGsBEjoI"
-                    onclick="downloadTranscript(this)">
-              Download Transcript
-            </button>
-            <span class="status" id="status-34"></span>
+            <span class="status" id="status-40"></span>
           </td>
         </tr>
 </tbody>
@@ -1224,8 +1452,44 @@
 </div>
 </div>
 
+<!-- Download Video Tab -->
+<div id="tab-download-video" class="tab-content">
+<div class="download-form">
+  <h2 style="color:#ff4444;margin-bottom:16px;font-size:18px;text-align:center">Download a Specific Video</h2>
+  <div class="form-group">
+    <label for="video-url-input">YouTube Video URL</label>
+    <input type="text" id="video-url-input" placeholder="https://www.youtube.com/watch?v=...">
+  </div>
+  <div class="form-group">
+    <label for="path-select">Summary Path</label>
+    <select id="path-select" onchange="toggleCustomPath()">
+      <option value="GitHub/AI_companies/youtube/NateBJones">GitHub/AI_companies/youtube/NateBJones</option><option value="GitHub/FINANCE/youtube/MarcoCasario">GitHub/FINANCE/youtube/MarcoCasario</option><option value="GitHub/FINANCE/youtube/MarcoCasarioExtra">GitHub/FINANCE/youtube/MarcoCasarioExtra</option><option value="GitHub/HEALTH/personal-health/massimo/health-goals/youtube/ValerioSolari">GitHub/HEALTH/personal-health/massimo/health-goals/youtube/ValerioSolari</option><option value="GitHub/HEALTH/personal-health/massimo/health-goals/youtube/VitoZennaro">GitHub/HEALTH/personal-health/massimo/health-goals/youtube/VitoZennaro</option><option value="GitHub/HEALTH/personal-health/massimo/health-goals/youtube/other">GitHub/HEALTH/personal-health/massimo/health-goals/youtube/other</option>
+      <option value="__other__">Other (custom path)</option>
+    </select>
+    <div id="custom-path-group">
+      <input type="text" id="custom-path-input" placeholder="e.g. GitHub/MYPROJECT/youtube/ChannelName">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="lang-select">Language</label>
+    <select id="lang-select">
+      <option value="en">English (en)</option>
+      <option value="it">Italian (it)</option>
+      <option value="es">Spanish (es)</option>
+      <option value="fr">French (fr)</option>
+      <option value="de">German (de)</option>
+    </select>
+  </div>
+  <div style="text-align:center">
+    <button class="submit-btn" id="download-video-btn" onclick="downloadVideo()">Download Video Transcript</button>
+  </div>
+  <div id="download-video-status" style="text-align:center;margin-top:12px"></div>
+</div>
+</div>
+
 <script>
 const API_BASE = 'http://192.168.1.16:8081';
+const NGINX_BASE = 'http://192.168.1.16:8080/shared3/cloud';
 let currentTab = 'latest';
 
 function switchTab(tab) {
@@ -1284,10 +1548,10 @@ async function loadDownloaded() {
     tbody.innerHTML = data.map(v => {
       let summaryCell = '<td class="action-cell">-</td>';
       if (v.summary_path) {
-        const summaryUrl = 'http://192.168.1.16:8080/shared3/cloud/' + v.summary_path;
-        summaryCell = `<td class="action-cell"><span class="summary-badge">Summary</span><br><a class="summary-link" href="${summaryUrl}" target="_blank">View Summary</a></td>`;
+        const summaryUrl = NGINX_BASE + '/' + v.summary_path;
+        summaryCell = `<td class="action-cell"><a class="summary-link" href="${summaryUrl}" target="_blank" style="color:#44ff44;font-size:13px;font-weight:500">View Summary</a></td>`;
       } else {
-        summaryCell = '<td class="action-cell"><span style="color:#666;font-size:12px">Pending</span></td>';
+        summaryCell = '<td class="action-cell"><span style="color:#666;font-size:12px">No summary</span></td>';
       }
       return `
       <tr data-channel="${escapeHtml(v.channel || '')}">
@@ -1343,7 +1607,7 @@ async function downloadTranscript(btn) {
       status.className = 'status success';
       status.textContent = 'Downloaded: ' + data.filename;
       if (data.summary_triggered) {
-        status.textContent += ' (summary generating...)';
+        status.textContent += ' (summary generating... ~2-5 min)';
       }
       setTimeout(() => { btn.closest('tr').style.display = 'none'; }, 1500);
     } else {
@@ -1356,6 +1620,63 @@ async function downloadTranscript(btn) {
     status.textContent = 'Server not running at ' + API_BASE;
     btn.disabled = false;
   }
+}
+
+function toggleCustomPath() {
+  const sel = document.getElementById('path-select');
+  const customGroup = document.getElementById('custom-path-group');
+  customGroup.style.display = sel.value === '__other__' ? 'block' : 'none';
+}
+
+async function downloadVideo() {
+  const urlInput = document.getElementById('video-url-input');
+  const pathSelect = document.getElementById('path-select');
+  const customPathInput = document.getElementById('custom-path-input');
+  const langSelect = document.getElementById('lang-select');
+  const btn = document.getElementById('download-video-btn');
+  const status = document.getElementById('download-video-status');
+
+  const videoUrl = urlInput.value.trim();
+  if (!videoUrl) {
+    status.innerHTML = '<span style="color:#ff4444">Please enter a YouTube URL</span>';
+    return;
+  }
+
+  let summaryPath = pathSelect.value;
+  if (summaryPath === '__other__') {
+    summaryPath = customPathInput.value.trim();
+    if (!summaryPath) {
+      status.innerHTML = '<span style="color:#ff4444">Please enter a custom path</span>';
+      return;
+    }
+  }
+
+  btn.disabled = true;
+  status.innerHTML = '<span style="color:#ffcc00">Downloading transcript...</span>';
+
+  try {
+    const resp = await fetch(API_BASE + '/download-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: videoUrl,
+        html_summary_path: summaryPath,
+        language: langSelect.value
+      })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      let msg = 'Downloaded: ' + data.filename;
+      if (data.summary_triggered) msg += ' (summary generating... ~2-5 min)';
+      status.innerHTML = '<span style="color:#44ff44">' + escapeHtml(msg) + '</span>';
+      urlInput.value = '';
+    } else {
+      status.innerHTML = '<span style="color:#ff4444">Error: ' + escapeHtml(data.error) + '</span>';
+    }
+  } catch (e) {
+    status.innerHTML = '<span style="color:#ff4444">Server not running at ' + API_BASE + '</span>';
+  }
+  btn.disabled = false;
 }
 </script>
 

@@ -60,7 +60,10 @@ Requirements:
 - Include a glossary if technical terms are used
 - Responsive design
 - Do NOT include any <script> tags
-- Output ONLY the HTML, no markdown fences or explanation
+
+CRITICAL: Your response must start with <!DOCTYPE html> and contain ONLY the HTML.
+Do NOT wrap it in markdown fences, tool calls, artifacts, or any other wrapper.
+Do NOT use any tools. Just output the raw HTML directly as plain text.
 """
 
 
@@ -72,6 +75,7 @@ def resolve_root(file_mapping):
     check_order = [
         ("docker", file_mapping.get("docker", "/data")),
         ("dxp8800", file_mapping.get("dxp8800", "/volume3/cloud")),
+        ("msi_edgexpert", file_mapping.get("msi_edgexpert", "/Volumes/cloud")),
         ("mac", file_mapping.get("mac", "/Volumes/cloud")),
     ]
     for platform, path in check_order:
@@ -473,6 +477,12 @@ def generate_summary(transcript_path, channel_name, title, upload_date, config,
         print(f"  [Summary] Error reading transcript: {e}")
         return
 
+    # Truncate very large transcripts to avoid exceeding context window
+    MAX_TRANSCRIPT_CHARS = 300000  # ~300KB
+    if len(transcript_content) > MAX_TRANSCRIPT_CHARS:
+        print(f"  [Summary] Transcript too large ({len(transcript_content)} chars), truncating to {MAX_TRANSCRIPT_CHARS}")
+        transcript_content = transcript_content[:MAX_TRANSCRIPT_CHARS]
+
     date_display = format_date_display(upload_date)
     prompt = SUMMARY_PROMPT.format(
         title=title,
@@ -485,15 +495,29 @@ def generate_summary(transcript_path, channel_name, title, upload_date, config,
 
     try:
         result = subprocess.run(
-            ["claude", "-p", prompt, "--output-format", "text"],
+            ["claude", "-p", prompt, "--output-format", "text",
+             "--tools", ""],
             input=transcript_content,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=600,
         )
         if result.returncode == 0 and result.stdout.strip():
+            output = result.stdout.strip()
+            # Extract HTML if wrapped in tool calls or artifacts
+            if not (output.startswith("<!") or output.startswith("<html")):
+                # Try to extract <!DOCTYPE html>...</html> from wrapped output
+                match = re.search(r'(<!DOCTYPE html>.*?</html>)', output,
+                                  re.DOTALL | re.IGNORECASE)
+                if match:
+                    output = match.group(1)
+                    print(f"  [Summary] Extracted HTML from wrapped output")
+                else:
+                    print(f"  [Summary] Claude CLI returned non-HTML output, skipping")
+                    print(f"  [Summary] First 200 chars: {output[:200]}")
+                    return
             with open(summary_path, "w", encoding="utf-8") as f:
-                f.write(result.stdout)
+                f.write(output)
             print(f"  [Summary] Generated: {summary_name}")
 
             # Update history.json with summary info
@@ -507,7 +531,7 @@ def generate_summary(transcript_path, channel_name, title, upload_date, config,
     except FileNotFoundError:
         print("  [Summary] Claude CLI not found. Install with: npm install -g @anthropic-ai/claude-code")
     except subprocess.TimeoutExpired:
-        print("  [Summary] Claude CLI timed out (300s)")
+        print("  [Summary] Claude CLI timed out (600s)")
     except Exception as e:
         print(f"  [Summary] Error: {e}")
 
@@ -742,6 +766,21 @@ def generate_html(all_videos, config):
     api_base = config.get("api_base", "")
     days_back = config.get("days_back", DAYS_BACK)
 
+    # Collect all unique html_summary_path values for the download-video tab
+    all_paths = []
+    for ch in config.get("channels", []):
+        p = ch.get("html_summary_path", "")
+        if p and p not in all_paths:
+            all_paths.append(p)
+    for v in config.get("videos", []):
+        p = v.get("html_summary_path", "")
+        if p and p not in all_paths:
+            all_paths.append(p)
+    path_options = "".join(
+        f'<option value="{html.escape(p)}">{html.escape(p)}</option>'
+        for p in sorted(all_paths)
+    )
+
     # Build unique channel list for filter dropdown
     channels_seen = []
     for v in all_videos:
@@ -795,6 +834,8 @@ def generate_html(all_videos, config):
             <span class="status" id="status-{i}"></span>
           </td>
         </tr>"""
+
+    nginx_base = config.get("file_mapping", {}).get("nginx_base", "")
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -977,6 +1018,59 @@ def generate_html(all_videos, config):
     border-radius: 3px;
     margin-top: 4px;
   }}
+  /* Download Video form */
+  .download-form {{
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 24px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }}
+  .download-form .form-group {{
+    margin-bottom: 16px;
+  }}
+  .download-form label {{
+    display: block;
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }}
+  .download-form select,
+  .download-form input[type="text"] {{
+    width: 100%;
+    background: #0f0f0f;
+    color: #f1f1f1;
+    border: 1px solid #333;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+  }}
+  .download-form select:focus,
+  .download-form input[type="text"]:focus {{
+    outline: none;
+    border-color: #ff4444;
+  }}
+  .download-form .submit-btn {{
+    background: #cc0000;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }}
+  .download-form .submit-btn:hover {{ background: #ff2222; }}
+  .download-form .submit-btn:disabled {{
+    background: #555;
+    cursor: not-allowed;
+  }}
+  #custom-path-group {{
+    display: none;
+    margin-top: 8px;
+  }}
 </style>
 </head>
 <body>
@@ -984,7 +1078,7 @@ def generate_html(all_videos, config):
 <h1>YouTube Follow - Latest Videos</h1>
 <p class="subtitle">Videos published in the last {days_back} days &bull; Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
 <p style="text-align:center;margin-bottom:16px">
-  <a href="{config.get("file_mapping", {{}}).get("nginx_base", "")}/GitHub/YOUTUBE/summaries_index.html"
+  <a href="{nginx_base}/GitHub/YOUTUBE/summaries_index.html"
      style="color:#6688ff;text-decoration:none;font-size:14px">
      View All Summaries Index
   </a>
@@ -1001,6 +1095,7 @@ def generate_html(all_videos, config):
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('latest')">Latest Videos</button>
   <button class="tab-btn" onclick="switchTab('downloaded')">Downloaded</button>
+  <button class="tab-btn" onclick="switchTab('download-video')">Download Video</button>
 </div>
 
 <!-- Latest Videos Tab -->
@@ -1048,9 +1143,44 @@ def generate_html(all_videos, config):
 </div>
 </div>
 
+<!-- Download Video Tab -->
+<div id="tab-download-video" class="tab-content">
+<div class="download-form">
+  <h2 style="color:#ff4444;margin-bottom:16px;font-size:18px;text-align:center">Download a Specific Video</h2>
+  <div class="form-group">
+    <label for="video-url-input">YouTube Video URL</label>
+    <input type="text" id="video-url-input" placeholder="https://www.youtube.com/watch?v=...">
+  </div>
+  <div class="form-group">
+    <label for="path-select">Summary Path</label>
+    <select id="path-select" onchange="toggleCustomPath()">
+      {path_options}
+      <option value="__other__">Other (custom path)</option>
+    </select>
+    <div id="custom-path-group">
+      <input type="text" id="custom-path-input" placeholder="e.g. GitHub/MYPROJECT/youtube/ChannelName">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="lang-select">Language</label>
+    <select id="lang-select">
+      <option value="en">English (en)</option>
+      <option value="it">Italian (it)</option>
+      <option value="es">Spanish (es)</option>
+      <option value="fr">French (fr)</option>
+      <option value="de">German (de)</option>
+    </select>
+  </div>
+  <div style="text-align:center">
+    <button class="submit-btn" id="download-video-btn" onclick="downloadVideo()">Download Video Transcript</button>
+  </div>
+  <div id="download-video-status" style="text-align:center;margin-top:12px"></div>
+</div>
+</div>
+
 <script>
 const API_BASE = '{api_base}';
-const NGINX_BASE = '{config.get("file_mapping", {{}}).get("nginx_base", "")}';
+const NGINX_BASE = '{nginx_base}';
 let currentTab = 'latest';
 
 function switchTab(tab) {{
@@ -1168,7 +1298,7 @@ async function downloadTranscript(btn) {{
       status.className = 'status success';
       status.textContent = 'Downloaded: ' + data.filename;
       if (data.summary_triggered) {{
-        status.textContent += ' (summary generating...)';
+        status.textContent += ' (summary generating... ~2-5 min)';
       }}
       setTimeout(() => {{ btn.closest('tr').style.display = 'none'; }}, 1500);
     }} else {{
@@ -1181,6 +1311,63 @@ async function downloadTranscript(btn) {{
     status.textContent = 'Server not running at ' + API_BASE;
     btn.disabled = false;
   }}
+}}
+
+function toggleCustomPath() {{
+  const sel = document.getElementById('path-select');
+  const customGroup = document.getElementById('custom-path-group');
+  customGroup.style.display = sel.value === '__other__' ? 'block' : 'none';
+}}
+
+async function downloadVideo() {{
+  const urlInput = document.getElementById('video-url-input');
+  const pathSelect = document.getElementById('path-select');
+  const customPathInput = document.getElementById('custom-path-input');
+  const langSelect = document.getElementById('lang-select');
+  const btn = document.getElementById('download-video-btn');
+  const status = document.getElementById('download-video-status');
+
+  const videoUrl = urlInput.value.trim();
+  if (!videoUrl) {{
+    status.innerHTML = '<span style="color:#ff4444">Please enter a YouTube URL</span>';
+    return;
+  }}
+
+  let summaryPath = pathSelect.value;
+  if (summaryPath === '__other__') {{
+    summaryPath = customPathInput.value.trim();
+    if (!summaryPath) {{
+      status.innerHTML = '<span style="color:#ff4444">Please enter a custom path</span>';
+      return;
+    }}
+  }}
+
+  btn.disabled = true;
+  status.innerHTML = '<span style="color:#ffcc00">Downloading transcript...</span>';
+
+  try {{
+    const resp = await fetch(API_BASE + '/download-video', {{
+      method: 'POST',
+      headers: {{ 'Content-Type': 'application/json' }},
+      body: JSON.stringify({{
+        url: videoUrl,
+        html_summary_path: summaryPath,
+        language: langSelect.value
+      }})
+    }});
+    const data = await resp.json();
+    if (data.success) {{
+      let msg = 'Downloaded: ' + data.filename;
+      if (data.summary_triggered) msg += ' (summary generating... ~2-5 min)';
+      status.innerHTML = '<span style="color:#44ff44">' + escapeHtml(msg) + '</span>';
+      urlInput.value = '';
+    }} else {{
+      status.innerHTML = '<span style="color:#ff4444">Error: ' + escapeHtml(data.error) + '</span>';
+    }}
+  }} catch (e) {{
+    status.innerHTML = '<span style="color:#ff4444">Server not running at ' + API_BASE + '</span>';
+  }}
+  btn.disabled = false;
 }}
 </script>
 
@@ -1299,6 +1486,118 @@ class RequestHandler(BaseHTTPRequestHandler):
                 save_history(history)
 
                 # Trigger summary generation in background
+                if html_summary_path:
+                    transcript_path = os.path.join(TRANSCRIPTS_DIR, response["filename"])
+                    threading.Thread(
+                        target=generate_summary,
+                        args=(transcript_path, channel, title, upload_date, CONFIG),
+                        kwargs={"html_summary_path": html_summary_path},
+                        daemon=True,
+                    ).start()
+                    summary_triggered = True
+
+                response["summary_triggered"] = summary_triggered
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(response).encode())
+
+        elif self.path == "/download-video":
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len)
+            data = json.loads(body)
+
+            video_url = data.get("url", "")
+            html_summary_path = data.get("html_summary_path", "")
+            sub_lang = data.get("language", DEFAULT_LANG)
+
+            # Fetch video metadata using yt-dlp
+            try:
+                meta_cmd = [
+                    "yt-dlp", "--dump-json", "--no-download", video_url
+                ]
+                meta_result = subprocess.run(meta_cmd, capture_output=True, text=True, timeout=30)
+                meta = json.loads(meta_result.stdout)
+                title = meta.get("title", "UnknownTitle")
+                channel = meta.get("channel", meta.get("uploader", "Unknown"))
+                # Remove spaces from channel name
+                channel = re.sub(r'[^a-zA-Z0-9]', '', channel)
+                upload_date = meta.get("upload_date", datetime.now().strftime("%Y%m%d"))
+                video_id = meta.get("id", "")
+                view_count = meta.get("view_count", 0)
+            except Exception as e:
+                response = {"success": False, "error": f"Could not fetch video info: {e}"}
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(json.dumps(response).encode())
+                return
+
+            transcript_name = build_transcript_filename(channel, upload_date, title)
+            os.makedirs(TRANSCRIPTS_DIR, exist_ok=True)
+            output_path = os.path.join(TRANSCRIPTS_DIR, transcript_name)
+
+            cmd = [
+                "yt-dlp",
+                "--write-auto-sub",
+                "--sub-lang", sub_lang,
+                "--skip-download",
+                "-o", output_path,
+                video_url,
+            ]
+
+            print(f"  [Download Video] Downloading transcript: {transcript_name}")
+
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+
+                expected_file = f"{output_path}.{sub_lang}.vtt"
+                filename = None
+                if os.path.exists(expected_file):
+                    filename = os.path.basename(expected_file)
+                else:
+                    for fname in os.listdir(TRANSCRIPTS_DIR):
+                        if fname.startswith(transcript_name):
+                            filename = fname
+                            break
+
+                if filename:
+                    response = {"success": True, "filename": filename}
+                    print(f"    Success: {filename}")
+                else:
+                    stderr_lines = result.stderr.strip().split("\n") if result.stderr else []
+                    error_msg = stderr_lines[-1] if stderr_lines else "No subtitle file created"
+                    response = {"success": False, "error": error_msg}
+                    print(f"    Failed: {error_msg}")
+
+            except subprocess.TimeoutExpired:
+                response = {"success": False, "error": "Download timed out"}
+            except Exception as e:
+                response = {"success": False, "error": str(e)}
+
+            # Record in history and trigger summary
+            summary_triggered = False
+            if response.get("success"):
+                history = load_history()
+                # Remove existing entry with same video_id to avoid duplicates
+                history = [e for e in history if e.get("video_id") != video_id]
+                history.append({
+                    "channel": channel,
+                    "title": title,
+                    "url": video_url,
+                    "video_id": video_id,
+                    "upload_date": upload_date,
+                    "language": sub_lang,
+                    "view_count": view_count,
+                    "filename": response["filename"],
+                    "downloaded_at": datetime.now().isoformat(),
+                    "html_summary_path": html_summary_path,
+                })
+                save_history(history)
+
                 if html_summary_path:
                     transcript_path = os.path.join(TRANSCRIPTS_DIR, response["filename"])
                     threading.Thread(

@@ -1,1 +1,2 @@
 0 */6 * * * cd /data/GitHub/YOUTUBE && python3 youtube_follow.py --generate-only >> /var/log/youtube-follow.log 2>&1
+30 */6 * * * cd /data/GitHub/YOUTUBE && python3 youtube_follow.py --generate-summaries >> /var/log/youtube-summaries.log 2>&1
